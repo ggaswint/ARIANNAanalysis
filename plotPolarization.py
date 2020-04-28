@@ -41,11 +41,11 @@ def plotPolarization():
 	fig, ax = plt.subplots(1, 1,figsize=(11, 7))
 	fig2, ax2 = plt.subplots(1, 1,figsize=(5,5))
 
-	file = '/home/geoffrey/ARIANNA/SpiceData/polData_dec30_800m_constTime_paperCheck_4fwhm_singleV2_80_300.npy' # 1,2,4,6
+	file = PathToARIANNAanalysis + '/data/SPICE_Dec30_2018_EFieldDataLPDA_AtTransmitter.npy'
 	data = np.load(file,allow_pickle=True)
 	# data ===> depths, polarization, max amplitudes theta, max amplitudes phi,time at max theta, time at max phi
-	data0 = np.delete(data[0],721) # A bad event
-	data1 = np.delete(data[1],721)
+	data0 = np.delete(data[0],720) # A bad event 721,722,725,2002,2143,2367
+	data1 = np.delete(data[1],720)
 
 
 	means, errors, depths = aveError(data0,np.rad2deg(np.arctan(data1)))

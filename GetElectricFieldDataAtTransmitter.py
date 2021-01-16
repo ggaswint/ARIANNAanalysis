@@ -7,6 +7,7 @@ from scipy.interpolate import interp1d
 from scipy.signal import hilbert
 from radiotools import helper as hp
 import getAnglesFromSPICE as getAngles # part of ARIANNAnalysis
+import getInsituCableDelays as getTimeDelays # part of ARIANNAnalysis
 
 from NuRadioReco.utilities import units
 from NuRadioReco.modules import channelResampler as CchannelResampler
@@ -73,7 +74,7 @@ def findElectricFieldProperties(nurFile, chans, force_Polarization=False):
 	for evt in template.get_events():
 		for station_object in evt.get_stations():
 			depth = getDepthsFromTimes(station_object.get_station_time())
-			if station_object.has_triggered() and depth > 800.0:# and bad_event not in [721,722,725,2002,2143,2367]:
+			if station_object.has_triggered():# and bad_event not in [721,722,725,2002,2143,2367]:
 				det.update(station_object.get_station_time())
 				channelStopFilter.run(evt,station_object,det)
 				channelBandPassFilter.run(evt, station_object, det, passband=[lower * units.MHz, upper * units.MHz], filter_type='rectangular')
@@ -87,7 +88,7 @@ def findElectricFieldProperties(nurFile, chans, force_Polarization=False):
 				#cTW.run(evt, station_object, det, window_function='hanning')
 
 				# time delays between channels
-				time_offsets = [-1.357185244587009,-0.7436246992782678,-0.1495028067361668,0.0,0.216011258544431,-0.1058818737270876,0.0,-0.8744174557431041]
+				time_offsets = getTimeDelays.getAdditionalInsituCableDelaysFromSpice()
 				for channel in station_object.iter_channels():
 					channel.set_trace_start_time(channel.get_trace_start_time()-time_offsets[channel.get_id()])
 
@@ -155,7 +156,9 @@ def findElectricFieldProperties(nurFile, chans, force_Polarization=False):
 	return depths, polData, ampsT, ampsP, EtimeT, EtimeP
 
 def main():
-	file = '/home/geoffrey/ARIANNA/Spice_750mDown_Dec30_2018_idl_10dB.nur'
+	print('Please replace file from below to the data you would like to analyze')
+	file = PathToARIANNAanalysis + '/data/Spice_750mDown_Dec30_2018_idl_10dB.nur'
+	print(file)
 
 	depths, polData, ampsT, ampsP, EtimeT, EtimeP = findElectricFieldProperties(file, [0,1,2,3])
 	np.save(PathToARIANNAanalysis + '/data/SPICE_Dec30_2018_EFieldDataLPDA_AtTransmitter',[depths, polData, ampsT, ampsP, EtimeT, EtimeP])

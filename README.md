@@ -47,6 +47,7 @@ $ cmake --build . -- install -j4 # if you have 4 cores available for compilation
 $ source ../root_install/bin/thisroot.sh # or thisroot.{fish,csh}
 
 Clone the repo
+
     $ cd # got to home directoy
     $ mkdir root-6.18.00
     $ git clone --branch v6-18-00-patches https://github.com/root-project/root.git root_src

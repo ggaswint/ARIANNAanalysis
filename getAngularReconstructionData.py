@@ -31,7 +31,8 @@ correclationDirectionFitter.begin(debug=False)
 channelStopFilter = NuRadioReco.modules.channelStopFilter.channelStopFilter()
 cTW = cTWindow.channelTimeWindow()
 cTW.begin(debug=False)
-det = detector_sys_uncertainties.DetectorSysUncertainties(source='sql',assume_inf=False)  # establish mysql connection
+det = detector_sys_uncertainties.DetectorSysUncertainties(source='sql',assume_inf=False)
+#det = detector.Detector(source='sql',assume_inf=False)
 
 def printHeaderDetailsPerEvent(file,channel_pairs):
 	n_events = readARIANNAData.begin([file])

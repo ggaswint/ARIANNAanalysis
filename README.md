@@ -37,7 +37,7 @@ The ARIANNA data is stored as ROOT files. NuRadioReco has its own file type, ".n
 
 The ARIANNA data processing software (snowShovel) was constructed to work with ROOT. Both pieces of software will need to be installed to manage ARIANNA data at the lowest level. This process can be tedious and often bug out multiple times before success. I provide a standard command sequence that should work for most Unix type systems. Note that snowShovel6 along with root 6.18.00 are two verified versions that work together and with NuRadioReco/python3. If you do not have python3 set as your default, DO IT! Don't live in the past.
 
-This particular sequence of commands proved successful for my Ubuntu 18.04.3 machine.
+This particular sequence of commands proved successful for my Ubuntu 18.04.3 machine. Hopefully copy paste into the terminal proves successful for you as well.
 
 
 $ git clone --branch v6-22-00-patches https://github.com/root-project/root.git root_src
@@ -46,23 +46,62 @@ $ cmake -DCMAKE_INSTALL_PREFIX=../root_install ../root_src # && check cmake conf
 $ cmake --build . -- install -j4 # if you have 4 cores available for compilation
 $ source ../root_install/bin/thisroot.sh # or thisroot.{fish,csh}
 
-Clone the repo
+Make root folder and clone GitHub repo
 
-    $ cd # got to home directoy
-    $ mkdir root-6.18.00
+    $ cd
+    $ mkdir root-6.18.00 && cd root-6.18.00
     $ git clone --branch v6-18-00-patches https://github.com/root-project/root.git root_src
 
-Make a directory for building
+Make the build file and insure it is using python3! Note that *-DPYTHON_EXECUTABLE=/path/to/desired/python* needs to be modified with your correct python path to python3. If your system uses python3 by default (i.e. python foo.py runs in python3) then you should be able to get the path with typing *which python* in the command line.
 
-    $ mkdir build
-    $ cd build
+    $ cmake -DPYTHON_EXECUTABLE=/path/to/desired/python -DCMAKE_INSTALL_PREFIX=../root_install ../root_src
 
-Run cmake and make
+Make build file. Note -j4 means use 4 cores for build. Should be fine.
 
-    $ cmake ../root
-    $ make -j8
+    $ cmake --build . -- install -j4
 
-Setup and run ROOT
+You need to tell the terminal about root by "sourceing" it
 
-    $ source bin/thisroot.sh
-    $ root
+    $ source ../root_install/bin/thisroot.sh
+
+A better way would be to edit your .bashrc or .bash_profile located in the home directory. At the end of this text I give my .bashrc extra lines to be used. To test root, first simply type root in the terminal. If a root GUI pops up, then it is installed successfully. Type *.q* to quit. Who wants to use this GUI? ew. Now lets see if pyROOT is working. Make a python file and type import ROOT. Execute this with *python filename.py*. If this works then you are all set with the ROOT installation. If either of these are broken, time to google or ask someone for help or simply retry the process (I know sounds crazy but i've seen crazy things in my life).
+
+In the extras folder there are two files called .rootrc and .rootlogon.C. Save these files as is to your home directory. They are crucial for getting MACROS to work between ROOT and snowShovel (the final step).
+
+# Installing snowShovel6
+
+snowShovel is the first framework built for ARIANNA. It contains scripts to communicate with the stations in Antarctica, and for debugging local stations. scripts/online will be a very familiar destination for any scientist working directly with the ARIANNA stations. snowShovel6 is a private code base, as with it comes the power to control the ARIANNA experiment. To download snowShovel type:
+
+    $ svn co https://arianna.ps.uci.edu/svn/repos/snowShovel/trunk snowShovel
+
+Note that a username and password is required, and insure that this link is to the latest version (version 6). Checkout https://arianna.ps.uci.edu/mediawiki/index.php/Local_DAQ_Instructions for detailed instructions on setting up snowShovel. Note that the root and snowShovel packages on that link are outdated and will not work with NuRadioReco, however the setup instructions for snowShovel are identical.
+
+# .bashrc extra links
+
+Here is an example of the extra lines to save in a .bashrc file. Note that */home/geoffrey* will need to be changed to whatever your home directoy is, and insure that all the paths are correct for your setup. Note that their is an additional link to ARIANNAanalysis.
+
+    export HOME="/home/geoffrey"
+    export SNS="/home/geoffrey/snowShovel6/snowShovel"
+    export SNSscripts="/home/geoffrey/snowShovel6/snowShovel/scripts"
+    export ROOTSYS="/home/geoffrey/root-6.18.00/root_install"
+    export Nu="/home/geoffrey/NuRadioReco"
+    export NuM="/home/geoffrey/NuRadioMC"
+    export Radio="/home/geoffrey/radiotools"
+    export ARIANNAanalysis="/home/geoffrey/ARIANNAanalysis/ARIANNAanalysis"
+
+    source ${ROOTSYS}/bin/thisroot.sh
+
+    export LD_LIBRARY_PATH=${ROOTSYS}/lib:${LD_LIBRARY_PATH}
+    export PYTHONPATH=${ROOTSYS}/lib:${PYTHONPATH}
+    export LD_LIBRARY_PATH=${SNS}/lib:${SNS}:${LD_LIBRARY_PATH}
+    export PYTHONPATH=${HOME}:${PYTHONPATH}
+    export PYTHONPATH=${SNS}/lib:${PYTHONPATH}
+    export PYTHONPATH=${SNS}/scripts:${PYTHONPATH}
+    export PYTHONPATH=${SNS}:${PYTHONPATH}
+    export PYTHONPATH=${Nu}/:${PYTHONPATH}
+    export PYTHONPATH=${NuM}/:${PYTHONPATH}
+    export PYTHONPATH=${Radio}/:${PYTHONPATH}
+    export PYTHONPATH=${ARIANNAanalysis}/:${PYTHONPATH}
+    export ROOT_INCLUDE_PATH=${SNS}/include:${ROOTSYS}/include/
+
+Do not forget to either restart the command line or source this file with *source .bashrc*

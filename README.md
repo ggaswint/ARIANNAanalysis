@@ -2,8 +2,20 @@
 
 # ARIANNAanalysis
 
-Plotting and Data Analysis scripts for the ARIANNA collaboration.
+Plotting and Data Analysis scripts for the ARIANNA collaboration. See *Installation Instructions and Additional Requirements* at the end of this text.
 
+# Example Figures
+These plots show some of the figures produced from the scripts within this package. They have also been published at: https://iopscience.iop.org/article/10.1088/1748-0221/15/09/P09039
+
+<img src="https://pbs.twimg.com/media/EkYqKtbWsAYwkGC?format=jpg&name=large"/>
+
+<img src="https://pbs.twimg.com/media/Er90oEhXAAIlPat?format=jpg&name=large"/>
+
+# Software
+
+
+
+# Installation Instructions and Additional Requirements
 
 Required packages include NuRadioReco and NuRadioMC along with all their dependencies. These two packages and a list of required dependencies are found on GitHub at:
 https://github.com/nu-radio/NuRadioReco

@@ -1,13 +1,17 @@
+<img src="https://pbs.twimg.com/media/EkYqKtbWsAYwkGC?format=jpg&name=large" align="right"  height="50"/>
+
 # ARIANNAanalysis
 
 Plotting and Data Analysis scripts for the ARIANNA collaboration.
 
-Required packages include NuRadioReco \cite{NuRadioRecogithub} and NuRadioMC \cite{NuRadioMCgithub} along with all their dependencies. These two packages and a list of required dependencies are found on GitHub at:
+
+Required packages include NuRadioReco and NuRadioMC along with all their dependencies. These two packages and a list of required dependencies are found on GitHub at:
 https://github.com/nu-radio/NuRadioReco
 and
 https://github.com/nu-radio/NuRadioMC
+To install, follow the instruction on the wiki page found within the ReadMe file.
 
-To install, follow the instruction on the wiki page found within the ReadMe file located at the bottom of the GitHub website for each package.
+The ARIANNA data is stored as ROOT files. NuRadioReco has its own file type, ".nur", along with a module to convert .root files to .nur files. If you can find and work exclusively with the .nur files then ROOT is unnecessary. The scripts below come in two versions when applicable (one version that reads .nur input files and the other for .root input files). I highly recommend the installing of ROOT and the other required software for ARIANNA data processing.
 
 Note that the python astropy package is often being upgraded which can cause AttributeErrors when using .nur files that were produced from earlier versions of NuRadioReco. To fix this, the .nur files will need to be remade using the latest version of NuRadioReco.
 

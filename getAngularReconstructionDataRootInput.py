@@ -1,6 +1,7 @@
 from NuRadioReco.detector import detector
 from NuRadioReco.detector import detector_sys_uncertainties
 from NuRadioReco.utilities import units
+from NuRadioReco.modules.io.snowshovel import readARIANNADataCalib as CreadARIANNAData
 from NuRadioReco.modules import channelResampler as CchannelResampler
 from NuRadioReco.modules.ARIANNA import hardwareResponseIncorporator as ChardwareResponseIncorporator
 from NuRadioReco.modules import channelTimeWindow as cTWindow
@@ -9,7 +10,6 @@ import NuRadioReco.modules.channelBandPassFilter
 import NuRadioReco.modules.channelStopFilter
 import NuRadioReco.modules.correlationDirectionFitter
 from NuRadioReco.framework.parameters import stationParameters as stnp
-from NuRadioReco.modules.io import NuRadioRecoio
 import numpy as np
 import os
 PathToARIANNAanalysis = os.environ['ARIANNAanalysis']
@@ -18,6 +18,7 @@ import logging
 logger = logging.getLogger('plotDeconvolvedEvents')
 logging.basicConfig(level=logging.WARNING)
 
+readARIANNAData = CreadARIANNAData.readARIANNAData()
 channelResampler = CchannelResampler.channelResampler()
 channelResampler.begin(debug=False)
 channelBandPassFilter = NuRadioReco.modules.channelBandPassFilter.channelBandPassFilter()
@@ -35,11 +36,11 @@ cTW.begin(debug=False)
 #det = detector_sys_uncertainties.DetectorSysUncertainties(source='sql',assume_inf=False)
 det = detector.Detector(source='sql',assume_inf=False)
 
-def printHeaderDetailsPerEvent(nurFile,channel_pairs):
-    template = NuRadioRecoio.NuRadioRecoio(nurFile)
+def printHeaderDetailsPerEvent(file,channel_pairs):
+    n_events = readARIANNAData.begin([file])
     direction_plot = []
     times = []
-    for evt in template.get_events():
+    for evt in readARIANNAData.run():
         for station in evt.get_stations():
             time = station.get_station_time()
             if station.has_triggered():
@@ -61,13 +62,13 @@ def printHeaderDetailsPerEvent(nurFile,channel_pairs):
 
 def main():
 
-    file = PathToARIANNAanalysis + '/data/Spice_750mDown_Dec30_2018_idl_10dB.nur'
+    file = PathToARIANNAanalysis + '/data/Spice_750mDown_Dec30_2018_idl_10dB.root'
 
     times, angles = printHeaderDetailsPerEvent(file,((0, 2), (1, 3)))
-    np.save(PathToARIANNAanalysis + '/data/cc_lpdas_stn51',[times,angles])
+    np.save(PathToARIANNAanalysis + '/data/cc_lpdas_stn51_rootInput',[times,angles])
 
     times, angles = printHeaderDetailsPerEvent(file,((4, 6), (5, 7)))
-    np.save(PathToARIANNAanalysis + '/data/cc_dipoles_stn51',[times,angles])
+    np.save(PathToARIANNAanalysis + '/data/cc_dipoles_stn51_rootInput',[times,angles])
 
 
 if __name__== "__main__":

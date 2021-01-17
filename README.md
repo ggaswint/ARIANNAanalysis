@@ -2,7 +2,7 @@
 
 # ARIANNAanalysis
 
-Plotting and Data Analysis scripts for the ARIANNA collaboration. Anyone looking to study large data sets from the ARIANNA detectors such as triggering, livetime, or essentially any measurable, and or looking to extend the ARIANNA neutrino reconstruction techniques would benefit from the scripts within this package. See *Installation Instructions and Additional Requirements* at the end of this text.
+Plotting and Data Analysis scripts for the ARIANNA collaboration. Anyone looking to study large data sets from the ARIANNA detectors such as triggering, livetime, or essentially any measurable, and or looking to extend the ARIANNA neutrino reconstruction techniques would benefit from the scripts within this package. See *Installation Instructions and Additional Requirements* at the end of this text and do not forget to add a link in .bashrc or .bash_profile (example at very end of this text).
 
 # Example Figures
 These plots show some of the figures produced from the scripts within this package. They have also been published at: https://iopscience.iop.org/article/10.1088/1748-0221/15/09/P09039
@@ -17,10 +17,13 @@ These plots show some of the figures produced from the scripts within this packa
 Takes the saved .npy RF angular data from the script *getAngularReconstructionData.py* or *getAngularReconstructionDataNurInput.py* and makes a polar plot of the reconstructed RF angular directions.
 
 **getAnglesFromSPICE.py**
-Used to find match the arrival and launch angular direction given the depth of the SPICEcore pulser for ARIANNA station 51 reciever
+Used to match the arrival and launch angular direction given the depth of the SPICEcore pulser for an ARIANNA station 51 receiver. Imported by other scripts in ARIANNAanalysis.
 
-**getAngularReconstructionData**
-Takes the .root file that contains the 2018 SPICEcore data from station 51 and stores the reconstructed the angular direction in a .npy file format. Requires pyROOT to be installed. The requirement for pyROOT is being phased out of the ARIANNA data analysis, and so it recommended that instead on uses the .nur files which are simply conversions from .root to .nur. These .nur files do not require additional software to be installed. A second script (*getAngularReconstructionDataNurInput.py*) is provided for the .nur input file type.
+**getAngularReconstructionDataRootInput** and **getAngularReconstructionDataNurInput**
+Reconstructs events arrival direction. In particular it is setup with and example that takes the .root file or equivalent .nur file that contains the 2018 SPICEcore data from station 51 and stores the reconstructed angular direction in a .npy file format. Using root input file requires pyROOT to be installed. The requirement for pyROOT is being phased out of the ARIANNA data analysis, and so it recommended that instead use the .nur files which are simply conversions from .root to .nur. These .nur files do not require additional software to be installed. However it is still recommended to have ROOT installed in order to make these file conversions and have some backwards compatibility. See **writeNurFileFromRootFile.py** for a conversion script. A second script (*getAngularReconstructionDataNurInput.py*) is provided for the .nur input file type.
+
+**getElectricFieldDataAtReciever.py**
+Reconstructs the electric field at the ARIANNA station. In particule using the SPICE data from 2018 which involves matching date stamps to pulser depths and getting the expected or reconstructed arrival direction from this. This script sort of builds on top of getAngularReconstructionData in the sense that it first requires a reconstruction of the RF direction. This is necessary to deconvolve out the antenna responses. Note that their is no ROOT input file type example. To see how to convert this to a ROOT input instead of nur input, check out differences between **getAngularReconstructionData** and **getAngularReconstructionDataNurInput**.
 
 
 # Installation Instructions and Additional Requirements

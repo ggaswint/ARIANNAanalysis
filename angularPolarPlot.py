@@ -1,19 +1,19 @@
 import os
 import matplotlib.pyplot  as plt
 import numpy as np
+PathToARIANNAanalysis = os.environ['ARIANNAanalysis']
 
 def angle_data(data):
-	Angles = np.asarray(data)
-	Zen = []
-	for i in range(len(Angles)):
-		Zen.append(float(Angles[i][0]))
-	Azi = []
-	for i in range(len(Angles)):
-		Azi.append(float(Angles[i][1]))
-	return Zen, Azi
+    Angles = np.asarray(data)
+    Zen = []
+    for i in range(len(Angles)):
+        Zen.append(float(Angles[i][0]))
+    Azi = []
+    for i in range(len(Angles)):
+        Azi.append(float(Angles[i][1]))
+    return Zen, Azi
 
 
-PathToARIANNAanalysis = os.getcwd()
 file = PathToARIANNAanalysis + '/data/cc_lpdas_stn51.npy'
 data = np.load(file,allow_pickle=True,encoding='bytes')
 times = data[0]
@@ -39,7 +39,10 @@ fig.savefig(save)
 fig = plt.figure()
 ax = fig.add_subplot(111, projection='polar')
 ax.plot(np.deg2rad(np.asarray(azi)), zen, 'o', MarkerSize=8,alpha=0.25)
-save = PathToARIANNAanalysis + '/data/angularDirectionPolar.png'
+save = PathToARIANNAanalysis + '/plots/angularDirectionPolar.png'
 fig.savefig(save)
+save = PathToARIANNAanalysis + '/plots/angularDirectionPolar.pdf'
+fig.savefig(save)
+
 
 plt.show()

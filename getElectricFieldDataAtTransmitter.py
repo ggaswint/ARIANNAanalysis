@@ -32,6 +32,8 @@ logger = logging.getLogger('GetElectricFieldDataAtTransmitter')
 logging.basicConfig(level=logging.WARNING)
 logger.disabled = True
 
+PathToARIANNAanalysis = os.environ['ARIANNAanalysis']
+
 channelResampler = CchannelResampler.channelResampler()
 channelResampler.begin(debug=False)
 channelBandPassFilter = NuRadioReco.modules.channelBandPassFilter.channelBandPassFilter()
@@ -43,15 +45,17 @@ electricFieldBandPassFilter = NuRadioReco.modules.electricFieldBandPassFilter.el
 channelStopFilter = NuRadioReco.modules.channelStopFilter.channelStopFilter()
 cTW = cTWindow.channelTimeWindow()
 cTW.begin(debug=False)
-det = detector_sys_uncertainties.DetectorSysUncertainties(source='sql',assume_inf=False)  # establish mysql connection
 
-PathToARIANNAanalysis = os.getcwd()
-color = ['C1','C2','C3','C4','C5','C6','C7','C8']
+#det = detector_sys_uncertainties.DetectorSysUncertainties(source='sql',assume_inf=False)  # establish mysql connection
+# An example of using a json detector as input. Can convert sql to jason using NuRadioReco in the detector folder there is a sql_to_json python script
+det = detector.Detector(source='json',json_filename=PathToARIANNAanalysis + '/data/arianna_detector_db.json',assume_inf=False)
+
 expData = np.load(PathToARIANNAanalysis + '/data/SPICE_dec30_timeVSdepth.npy')
 timesRun = expData[0]
 depthsRun = expData[1]
 f_data = interp1d(timesRun, depthsRun)
 
+#converts time stamp to fractional hour so can be used to acces what the depth of the pulser was per second.
 def getDepthsFromTimes(time):
 	depth = 0
 	time = str(time)[11:]
@@ -72,32 +76,33 @@ def findElectricFieldProperties(nurFile, chans, force_Polarization=False):
 	lower = 80 # Filter MHz
 	upper = 300 # Filter MHz
 	for evt in template.get_events():
-		for station_object in evt.get_stations():
-			depth = getDepthsFromTimes(station_object.get_station_time())
-			if station_object.has_triggered():# and bad_event not in [721,722,725,2002,2143,2367]:
-				det.update(station_object.get_station_time())
-				channelStopFilter.run(evt,station_object,det)
-				channelBandPassFilter.run(evt, station_object, det, passband=[lower * units.MHz, upper * units.MHz], filter_type='rectangular')
-				hardwareResponseIncorporator.run(evt, station_object, det, sim_to_data=False)
-				channelSignalReconstructor.run(evt,station_object,det)
-				channelResampler.run(evt, station_object, det, sampling_rate=50*units.GHz)
+		for station in evt.get_stations():
+			depth = getDepthsFromTimes(station.get_station_time())
+			if station.has_triggered():# and bad_event not in [721,722,725,2002,2143,2367]:
+				det.update(station.get_station_time())
+				channelStopFilter.run(evt,station,det)
+				channelBandPassFilter.run(evt, station, det, passband=[lower * units.MHz, upper * units.MHz], filter_type='rectangular')
+				hardwareResponseIncorporator.run(evt, station, det, sim_to_data=False)
+				channelSignalReconstructor.run(evt,station,det)
+				channelResampler.run(evt, station, det, sampling_rate=50*units.GHz)
 				Zen, Azi = np.asarray(getAngles.findZenAziFromSpiceDataLPDAs(depth)[3])*units.deg
-				station_object.set_parameter(stnp.zenith,Zen)
-				station_object.set_parameter(stnp.azimuth,Azi)
-				sampling_rate = station_object.get_channel(0).get_sampling_rate()
-				#cTW.run(evt, station_object, det, window_function='hanning')
+				station.set_parameter(stnp.zenith,Zen)
+				station.set_parameter(stnp.azimuth,Azi)
+				sampling_rate = station.get_channel(0).get_sampling_rate()
+				#cTW.run(evt, station, det, window_function='hanning')
 
 				# time delays between channels
 				time_offsets = getTimeDelays.getAdditionalInsituCableDelaysFromSpice()
-				for channel in station_object.iter_channels():
+				for channel in station.iter_channels():
 					channel.set_trace_start_time(channel.get_trace_start_time()-time_offsets[channel.get_id()])
 
 
-				voltageToEfieldConverter.run(evt, station_object, det, use_channels=chans, force_Polarization=force_Polarization)
-				electricFieldBandPassFilter.run(evt, station_object, det, passband=[lower * units.MHz, upper * units.MHz], filter_type='rectangular')
+				voltageToEfieldConverter.run(evt, station, det, use_channels=chans, force_Polarization=force_Polarization)
+				electricFieldBandPassFilter.run(evt, station, det, passband=[lower * units.MHz, upper * units.MHz], filter_type='rectangular')
 
 
-				#### frequency dependent propagation attenuation
+				#### frequency dependent attenuation due to propogation through the ice. Can be verified and cleaned up.
+				# A lot of this is dealing with NuRadioMC ray tracing, if not familiar start with some of those examples in ARIANNAanalysis
 				ice = medium.southpole_simple()
 				z_0 = 80.0
 				delta_n = 1.78-1.353
@@ -110,9 +115,9 @@ def findElectricFieldProperties(nurFile, chans, force_Polarization=False):
 				solution = r.find_solutions(x1, x2)
 				C_0 = solution[0]['C0']
 				max_detector_freq = 0.5*units.GHz
-				freq = station_object.get_electric_fields()[0].get_frequencies()
+				freq = station.get_electric_fields()[0].get_frequencies()
 				att = r.get_attenuation_along_path(x1, x2, C_0, freq, max_detector_freq)
-				spectrum = station_object.get_electric_fields()[0].get_frequency_spectrum()
+				spectrum = station.get_electric_fields()[0].get_frequency_spectrum()
 				newSpectrum = spectrum/att
 				freq_mask = freq > upper*units.MHz
 				newSpectrum[0][freq_mask] = 0
@@ -122,14 +127,14 @@ def findElectricFieldProperties(nurFile, chans, force_Polarization=False):
 				newSpectrum[0][freq_mask] = 0
 				newSpectrum[1][freq_mask] = 0
 				newSpectrum[2][freq_mask] = 0
-				station_object.get_electric_fields()[0].set_frequency_spectrum(newSpectrum, sampling_rate)
+				station.get_electric_fields()[0].set_frequency_spectrum(newSpectrum, sampling_rate)
 
 
-				etheta = station_object.get_electric_fields()[0].get_trace()[1]
-				ephi = station_object.get_electric_fields()[0].get_trace()[2]
-				e_times = station_object.get_electric_fields()[0].get_times()
-				h_etheta = hilbert(station_object.get_electric_fields()[0].get_trace()[1])
-				h_ephi = hilbert(station_object.get_electric_fields()[0].get_trace()[2])
+				etheta = station.get_electric_fields()[0].get_trace()[1]
+				ephi = station.get_electric_fields()[0].get_trace()[2]
+				e_times = station.get_electric_fields()[0].get_times()
+				h_etheta = hilbert(station.get_electric_fields()[0].get_trace()[1])
+				h_ephi = hilbert(station.get_electric_fields()[0].get_trace()[2])
 				h3 = np.sqrt(np.abs(h_etheta)**2 + np.abs(h_ephi)**2)
 				fwhm = hp.get_FWHM_hilbert(h3)
 
@@ -150,7 +155,7 @@ def findElectricFieldProperties(nurFile, chans, force_Polarization=False):
 				EtimeT.append(e_times[time_idx_theta])
 				EtimeP.append(e_times[time_idx_phi])
 
-				channelResampler.run(evt, station_object, det, sampling_rate=1*units.GHz)
+				channelResampler.run(evt, station, det, sampling_rate=1*units.GHz)
 			event_count += 1
 
 	return depths, polData, ampsT, ampsP, EtimeT, EtimeP

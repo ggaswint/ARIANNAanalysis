@@ -1,4 +1,4 @@
-<img src="https://pbs.twimg.com/media/EkYqKtbWsAYwkGC?format=jpg&name=large" align="right"  height="50"/>
+<img src="https://pbs.twimg.com/media/EkYqKtbWsAYwkGC?format=jpg&name=large"/>
 
 # ARIANNAanalysis
 

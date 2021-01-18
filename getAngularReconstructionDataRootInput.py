@@ -36,7 +36,7 @@ cTW.begin(debug=False)
 #det = detector_sys_uncertainties.DetectorSysUncertainties(source='sql',assume_inf=False)
 det = detector.Detector(source='sql',assume_inf=False)
 
-def printHeaderDetailsPerEvent(file,channel_pairs):
+def getAngularData(file,channel_pairs):
     n_events = readARIANNAData.begin([file])
     direction_plot = []
     times = []
@@ -45,6 +45,7 @@ def printHeaderDetailsPerEvent(file,channel_pairs):
             time = station.get_station_time()
             if station.has_triggered():
                 det.update(station.get_station_time())
+                station.set_is_neutrino()
                 l1s = []
                 channelStopFilter.run(evt,station,det)
                 #channelBandPassFilter.run(evt, station, det, passband=[80 * units.MHz, 300 * units.MHz], filter_type='butterabs',order=10)
@@ -64,10 +65,10 @@ def main():
 
     file = PathToARIANNAanalysis + '/data/Spice_750mDown_Dec30_2018_idl_10dB.root'
 
-    times, angles = printHeaderDetailsPerEvent(file,((0, 2), (1, 3)))
+    times, angles = getAngularData(file,((0, 2), (1, 3)))
     np.save(PathToARIANNAanalysis + '/data/cc_lpdas_stn51_rootInput',[times,angles])
 
-    times, angles = printHeaderDetailsPerEvent(file,((4, 6), (5, 7)))
+    times, angles = getAngularData(file,((4, 6), (5, 7)))
     np.save(PathToARIANNAanalysis + '/data/cc_dipoles_stn51_rootInput',[times,angles])
 
 

@@ -6,7 +6,7 @@ PathToARIANNAanalysis = os.environ['ARIANNAanalysis']
 
 
 # Uses 2019 data instead of 2018 data because the transmitters signal amplitude changed over time, and the expected efield was given in 2019. Another SPICEcore run was performed in 2019 and therefor this data was used
-file_names = ['expectedEfieldSpice2019.npy','predictedEfieldSpice2019.npy'] #singles 2019
+file_names = ['expectedEfieldSpice2019.npy','predictedEfieldSpice2019.npy'] #singles 2019. Second file taken from when pulser was at 1200m depth, corresponds to launch angle used for first file (anechoic data)
 
 # 1/r scaling factors
 factor_anechoic = 3.0 # Seperation distance between transmitter and LPDA receiver for anechoic test

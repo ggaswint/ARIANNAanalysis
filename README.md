@@ -29,19 +29,25 @@ Same as **getElectricFieldDataAtReciever.py** except propogates electric field t
 A helper definition to access recalculated cable delays but looking at the average time offset between channels in station 50 over a range of depths and after accounting for all time delays due to geometry and measured cable delays.
 
 **helpfulUtils.py**
-Some utility functions used by various scripts. 
+Some utility functions used by various scripts.
 
 **plotAngularDirectionInPolarForm.py:**
 Takes the saved .npy RF angular data from the script *getAngularReconstructionDataRootInput.py* or *getAngularReconstructionDataNurInput.py* and makes a polar plot of the reconstructed RF angular directions.
+
+**plotAngularDirectionPlusHist.py**
+Makes the first figure shown in this ReadMe file. Plots the delta angular direction between true and reconstructed for the SPICE 2018 data.
 
 **plotBirefringence.py**
 Plots the birefringence seen in the 2018 SPICEcore data from station 51.
 
 **plotExpectedEfieldVsPrecitedEfieldSpice2018.py**
-Plots the expected electric field over the predicted electric field for the SPICEcore data in 2019. 2019 used due to discrepancies between transmitter signal amplitudes between 2019 and 2019, and the expected electric field was given at the end of 2019.
+Makes the second figure shown in this ReadMe file. Plots the expected electric field over the predicted electric field for the SPICEcore data in 2019. 2019 used due to discrepancies between transmitter signal amplitudes between 2019 and 2019, and the expected electric field was given at the end of 2019.
 
 **plotPolarization.py**
 Plots the polarization data obtained from **getElectricFieldDataAtReciever.py**.
+
+**plotSpaceAngularDirectionPlusHist.py**
+Plots the delta space angular direction between true and reconstructed for the SPICE 2018 data.
 
 **printStations.py**
 A way to print out some of an ARIANNA stations configuration such as antenna types and orientations.

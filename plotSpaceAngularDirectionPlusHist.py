@@ -13,97 +13,97 @@ cut_val = 1.49 # events larger than this uncertainty are cut for plotting purpos
 
 
 def getStartStop(depth, start_depth, end_depth, reverse=False):
-	first = True
-	second = True
-	start=0
-	end=0
-	if reverse:
-		depth = depth[::-1]
-	for i in range(len(depth)):
-		if depth[i] < end_depth and first:
-			start = i
-			first = False
-		if depth[i] < start_depth and second:
-			end = i
-			second = False
-	return start,end
+    first = True
+    second = True
+    start=0
+    end=0
+    if reverse:
+        depth = depth[::-1]
+    for i in range(len(depth)):
+        if depth[i] < end_depth and first:
+            start = i
+            first = False
+        if depth[i] < start_depth and second:
+            end = i
+            second = False
+    return start,end
 
 def angle_data(data):
-	Angle = np.asarray(data)# L1 data data
-	Zen = []
-	for i in range(len(Angle)):
-		Zen.append(float(Angle[i][0]))
-	Azi = []
-	for i in range(len(Angle)):
-		Azi.append(float(Angle[i][1]))
-	return Zen, Azi
+    Angle = np.asarray(data)# L1 data data
+    Zen = []
+    for i in range(len(Angle)):
+        Zen.append(float(Angle[i][0]))
+    Azi = []
+    for i in range(len(Angle)):
+        Azi.append(float(Angle[i][1]))
+    return Zen, Azi
 
 def getData(file, dataE, ys, reverse=False):
-	set1 = np.load(file,allow_pickle=True,encoding='bytes')
-	depth = set1[0]
-	data = set1[1]
-	Zen, Azi = angle_data(data)
-	ZenE = []
-	for i in range(len(depth)):
-		idx = hu.find_nearest(np.asarray(dataE[0]), depth[i])
-		ZenE.append(ys[idx])
-	return np.asarray(Zen), np.asarray(Azi), np.asarray(ZenE), np.ones(len(Azi))*312.448284, np.asarray(depth)
+    set1 = np.load(file,allow_pickle=True,encoding='bytes')
+    depth = set1[0]
+    data = set1[1]
+    Zen, Azi = angle_data(data)
+    ZenE = []
+    for i in range(len(depth)):
+        idx = hu.find_nearest(np.asarray(dataE[0]), depth[i])
+        ZenE.append(ys[idx])
+    return np.asarray(Zen), np.asarray(Azi), np.asarray(ZenE), np.ones(len(Azi))*312.448284, np.asarray(depth)
 
 def gaussianHist(ax,gg_exp_diff,color,label,pos,line,label2):
-	gg_exp_diff2 = []
-	for j in range(len(gg_exp_diff)):
-		if np.abs(gg_exp_diff[j]) < cut_val:
-			gg_exp_diff2.append(gg_exp_diff[j])
+    gg_exp_diff2 = []
+    for j in range(len(gg_exp_diff)):
+        if np.abs(gg_exp_diff[j]) < cut_val:
+            gg_exp_diff2.append(gg_exp_diff[j])
 
-	(mu, sigma) = norm.fit(gg_exp_diff)
-	fig2, ax2 = plt.subplots(1, 1)
-	n, bins, patches = ax.hist(gg_exp_diff,linestyle=line,bins=np.arange(-1.5, 3.6, 0.1),edgecolor=color,fill=False,label=label2,histtype='step',orientation='horizontal')#,weights=weights) histype = bar
-	if label2 == 'dipoles':
-		ax.text(0.99,0.98,label,horizontalalignment='right',verticalalignment='top',transform=ax.transAxes,color='darkred')
-	if label2 == 'lpdas':
-		ax.text(0.99,0.90,label,horizontalalignment='right',verticalalignment='top',transform=ax.transAxes,color='midnightblue')
-	plt.close(fig2)
+    (mu, sigma) = norm.fit(gg_exp_diff)
+    fig2, ax2 = plt.subplots(1, 1)
+    n, bins, patches = ax.hist(gg_exp_diff,linestyle=line,bins=np.arange(-1.5, 3.6, 0.1),edgecolor=color,fill=False,label=label2,histtype='step',orientation='horizontal')#,weights=weights) histype = bar
+    if label2 == 'dipoles':
+        ax.text(0.99,0.98,label,horizontalalignment='right',verticalalignment='top',transform=ax.transAxes,color='darkred')
+    if label2 == 'lpdas':
+        ax.text(0.99,0.90,label,horizontalalignment='right',verticalalignment='top',transform=ax.transAxes,color='midnightblue')
+    plt.close(fig2)
 
 
 # Note this is now a rayleigh distribution
 def getMeanSTDStr(data):
-	gg_exp_diff2 = []
-	for j in range(len(data)):
-		if np.abs(data[j]) < cut_val:
-			gg_exp_diff2.append(data[j])
-	#data = gg_exp_diff2
-	mean = np.mean(data)
-	std = np.std(data)
-	textstr1 = r"$\mu$ = %.2g" % (mean)
-	textstr2 = r"$\sigma$ = %.2g" % (std)
-	rayleigh = np.sort(data)
-	rayleigh_std = rayleigh[int(0.68*(len(rayleigh)+1))]
-	#return [textstr1, textstr2]
-	print('sigma ' + str(stat.quantile_1d(data, np.ones_like(data), 0.68)))
-	textstr3 = r"$\mu$ = %.2g$^{\circ}$, $\sigma_{68\%%}$ = %.2g$^{\circ}$" % (mean,rayleigh_std)
-	return textstr3
+    gg_exp_diff2 = []
+    for j in range(len(data)):
+        if np.abs(data[j]) < cut_val:
+            gg_exp_diff2.append(data[j])
+    #data = gg_exp_diff2
+    mean = np.mean(data)
+    std = np.std(data)
+    textstr1 = r"$\mu$ = %.2g" % (mean)
+    textstr2 = r"$\sigma$ = %.2g" % (std)
+    rayleigh = np.sort(data)
+    rayleigh_std = rayleigh[int(0.68*(len(rayleigh)+1))]
+    #return [textstr1, textstr2]
+    print('sigma ' + str(stat.quantile_1d(data, np.ones_like(data), 0.68)))
+    textstr3 = r"$\mu$ = %.2g$^{\circ}$, $\sigma_{68\%%}$ = %.2g$^{\circ}$" % (mean,rayleigh_std)
+    return textstr3
 
 
 def aveError(depth,data):
-	depth = np.asarray(depth)
-	depth = np.round(depth.astype(float), -1)
-	#depth = np.unique(np.round(depth.astype(float), -1))
-	means = []
-	stds = []
-	depths = []
-	for d in np.unique(np.round(depth.astype(float), -1)):
-		mask = depth==d
-		means.append(data[mask].mean())
-		stds.append(data[mask].std())
-		depths.append(d)
-	return means, stds, depths
+    depth = np.asarray(depth)
+    depth = np.round(depth.astype(float), -1)
+    #depth = np.unique(np.round(depth.astype(float), -1))
+    means = []
+    stds = []
+    depths = []
+    for d in np.unique(np.round(depth.astype(float), -1)):
+        mask = depth==d
+        means.append(data[mask].mean())
+        stds.append(data[mask].std())
+        depths.append(d)
+    return means, stds, depths
 
 def get_single_angle(zenith_reco,azimuth_reco,zenith_exp,azimuth_exp):
-	vspherical_to_cartesian = np.vectorize(hp.spherical_to_cartesian,otypes=[np.ndarray])
-	vget_angle = np.vectorize(hp.get_angle)
-	v1 = vspherical_to_cartesian(zenith_reco, azimuth_reco)
-	v2 = vspherical_to_cartesian(zenith_exp, azimuth_exp)
-	return vget_angle(v1, v2)
+    vspherical_to_cartesian = np.vectorize(hp.spherical_to_cartesian,otypes=[np.ndarray])
+    vget_angle = np.vectorize(hp.get_angle)
+    v1 = vspherical_to_cartesian(zenith_reco, azimuth_reco)
+    v2 = vspherical_to_cartesian(zenith_exp, azimuth_exp)
+    return vget_angle(v1, v2)
 
 R_50 = 937.63763764
 R_10 = 1180.98098098

@@ -24,7 +24,7 @@ def printStations():
 		print('station: ' + str(station))
 		for channel in range(det.get_number_of_channels(station)):
 			if abs(det.get_antenna_orientation(station,channel)[0]/units.deg - 180) < 10.0:
-				print('channel: ' + str(channel) + ' type: ' + str(det.get_antenna_type(station,channel)) +' antenna is upside down')
+				print('channel: ' + str(channel) + ' type: ' + str(det.get_antenna_type(station,channel)) +' antenna is pointing down')
 			else:
 				print('channel: ' + str(channel) + ' type: ' + str(det.get_antenna_type(station,channel)))
 			print('orientation: ' + str(det.get_antenna_orientation(station,channel)/units.deg) + 'degrees')

@@ -2,7 +2,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import os
 
-PathToARIANNAanalysis = os.getcwd()
+PathToARIANNAanalysis = os.environ['ARIANNAanalysis']
 
 def aveError(depth,data):
 	depth = np.asarray(depth)

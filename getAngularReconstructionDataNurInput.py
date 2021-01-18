@@ -44,6 +44,7 @@ def printHeaderDetailsPerEvent(nurFile,channel_pairs):
             time = station.get_station_time()
             if station.has_triggered():
                 det.update(station.get_station_time())
+                station.set_is_neutrino()
                 l1s = []
                 channelStopFilter.run(evt,station,det)
                 #channelBandPassFilter.run(evt, station, det, passband=[80 * units.MHz, 300 * units.MHz], filter_type='butterabs',order=10)

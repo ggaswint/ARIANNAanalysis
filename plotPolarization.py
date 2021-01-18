@@ -3,8 +3,7 @@ import numpy as np
 import matplotlib.pyplot  as plt
 from scipy.interpolate import interp1d
 
-
-PathToARIANNAanalysis = os.getcwd()
+PathToARIANNAanalysis = os.environ['ARIANNAanalysis']
 
 def gaussianHist(ax,data,color,label,line):
 	n, bins, patches = ax.hist(data,linestyle=line,bins=np.arange(-15.0, 15.1, 1.0),edgecolor=color,fill=False,histtype='step')#,weights=weights) histype = bar
@@ -101,8 +100,6 @@ def plotPolarization():
 	ax.fill_between([shading_inputs[2],shading_inputs[3]],[-17,-17],color='black',alpha=0.15,linewidth=0.0)
 	ax.fill_between([shading_inputs[4],shading_inputs[5]],[60,60],color='black',alpha=0.15,linewidth=0.0)
 	ax.fill_between([shading_inputs[4],shading_inputs[5]],[-17,-17],color='black',alpha=0.15,linewidth=0.0)
-
-
 
 
 	mask_spice = (data0 >= 938.0)

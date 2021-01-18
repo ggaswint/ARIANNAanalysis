@@ -14,7 +14,7 @@ These plots show some of the figures produced from the scripts within this packa
 # Software
 
 **angularPolarPlot.py:**
-Takes the saved .npy RF angular data from the script *getAngularReconstructionData.py* or *getAngularReconstructionDataNurInput.py* and makes a polar plot of the reconstructed RF angular directions.
+Takes the saved .npy RF angular data from the script *getAngularReconstructionDataRootInput.py* or *getAngularReconstructionDataNurInput.py* and makes a polar plot of the reconstructed RF angular directions.
 
 **getAnglesFromSPICE.py**
 Used to match the arrival and launch angular direction given the depth of the SPICEcore pulser for an ARIANNA station 51 receiver. Imported by other scripts in ARIANNAanalysis.
@@ -23,8 +23,25 @@ Used to match the arrival and launch angular direction given the depth of the SP
 Reconstructs events arrival direction. In particular it is setup with and example that takes the .root file or equivalent .nur file that contains the 2018 SPICEcore data from station 51 and stores the reconstructed angular direction in a .npy file format. Using root input file requires pyROOT to be installed. The requirement for pyROOT is being phased out of the ARIANNA data analysis, and so it recommended that instead use the .nur files which are simply conversions from .root to .nur. These .nur files do not require additional software to be installed. However it is still recommended to have ROOT installed in order to make these file conversions and have some backwards compatibility. See **writeNurFileFromRootFile.py** for a conversion script. A second script (*getAngularReconstructionDataNurInput.py*) is provided for the .nur input file type.
 
 **getElectricFieldDataAtReciever.py**
-Reconstructs the electric field at the ARIANNA station. In particule using the SPICE data from 2018 which involves matching date stamps to pulser depths and getting the expected or reconstructed arrival direction from this. This script sort of builds on top of getAngularReconstructionData in the sense that it first requires a reconstruction of the RF direction. This is necessary to deconvolve out the antenna responses. Note that their is no ROOT input file type example. To see how to convert this to a ROOT input instead of nur input, check out differences between **getAngularReconstructionData** and **getAngularReconstructionDataNurInput**.
+Reconstructs the electric field at the ARIANNA station. In particular using the SPICE data from 2018 which involves matching date stamps to pulser depths and getting the expected or reconstructed arrival direction from this. This script sort of builds on top of getAngularReconstructionData in the sense that it first requires a reconstruction of the RF direction. This is necessary to deconvolve out the antenna responses. Note that their is no ROOT input file type example. To see how to convert this to a ROOT input instead of nur input, check out differences between **getAngularReconstructionData** and **getAngularReconstructionDataNurInput**.
 
+**getElectricFieldDataAtTransmitter.py**
+Same as **getElectricFieldDataAtReciever.py** except propogates electric field to the source by deconvolving frequency dependent ice attenuation. Note does not deconvolve 1/distance attenuation. This was added in **plotExpectedEfieldVsPrecitedEfieldSpice2018.py** when comparing the expected transmitter efiled to reconstructed efield. This is done for the SPICE 2018 data.
+
+**getInsituCableDelays.py**
+A helper definition to access recalculated cable delays but looking at the average time offset between channels in station 50 over a range of depths and after accounting for all time delays due to geometry and measured cable delays.
+
+**plotBirefringence.py**
+Plots the birefringence seen in the 2018 SPICEcore data from station 51.
+
+**plotExpectedEfieldVsPrecitedEfieldSpice2018.py**
+Plots the expected electric field over the predicted electric field for the SPICEcore data in 2019. 2019 used due to discrepancies between transmitter signal amplitudes between 2019 and 2019, and the expected electric field was given at the end of 2019.
+
+**plotPolarization.py**
+Plots the polarization data obtained from **getElectricFieldDataAtReciever.py**.
+
+**printStations.py**
+A way to print out some of an ARIANNA stations configuration such as antenna types and orientations.
 
 # Installation Instructions and Additional Requirements
 

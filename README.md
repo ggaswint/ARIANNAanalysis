@@ -13,9 +13,6 @@ These plots show some of the figures produced from the scripts within this packa
 
 # Software
 
-**angularPolarPlot.py:**
-Takes the saved .npy RF angular data from the script *getAngularReconstructionDataRootInput.py* or *getAngularReconstructionDataNurInput.py* and makes a polar plot of the reconstructed RF angular directions.
-
 **getAnglesFromSPICE.py**
 Used to match the arrival and launch angular direction given the depth of the SPICEcore pulser for an ARIANNA station 51 receiver. Imported by other scripts in ARIANNAanalysis.
 
@@ -30,6 +27,12 @@ Same as **getElectricFieldDataAtReciever.py** except propogates electric field t
 
 **getInsituCableDelays.py**
 A helper definition to access recalculated cable delays but looking at the average time offset between channels in station 50 over a range of depths and after accounting for all time delays due to geometry and measured cable delays.
+
+**helpfulUtils.py**
+Some utility functions used by various scripts. 
+
+**plotAngularDirectionInPolarForm.py:**
+Takes the saved .npy RF angular data from the script *getAngularReconstructionDataRootInput.py* or *getAngularReconstructionDataNurInput.py* and makes a polar plot of the reconstructed RF angular directions.
 
 **plotBirefringence.py**
 Plots the birefringence seen in the 2018 SPICEcore data from station 51.

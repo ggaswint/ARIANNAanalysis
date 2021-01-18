@@ -2,7 +2,7 @@
 
 # ARIANNAanalysis
 
-Plotting and Data Analysis scripts for the ARIANNA collaboration. Anyone looking to study large data sets from the ARIANNA detectors such as triggering, livetime, or essentially any measurable, and or looking to extend the ARIANNA neutrino reconstruction techniques would benefit from the scripts within this package. See *Installation Instructions and Additional Requirements* at the end of this text and do not forget to add a link in .bashrc or .bash_profile (example at very end of this text).
+Plotting and Data Analysis scripts for the ARIANNA collaboration. Anyone looking to study large data sets from the ARIANNA detectors such as triggering, livetime, or essentially any measurable, and or looking to extend the ARIANNA neutrino reconstruction techniques would benefit from the scripts within this package. See *Installation Instructions and Additional Requirements* at the end of this text and do not forget to add a pythonpath to this directory in .bashrc or .bash_profile (example at very end of this text).
 
 # Example Figures
 These plots show some of the figures produced from the scripts within this package. They have also been published at: https://iopscience.iop.org/article/10.1088/1748-0221/15/09/P09039

@@ -19,7 +19,7 @@ Calculates the cable delays on the fly by looking at the average time offset bet
 **getAnglesFromSPICE.py**
 Used to match the arrival and launch angular direction given the depth of the SPICEcore pulser for an ARIANNA station 51 receiver. Imported by other scripts in ARIANNAanalysis.
 
-**getAngularReconstructionDataRootInput** and **getAngularReconstructionDataNurInput**
+**getAngularReconstructionDataRootInput.py** and **getAngularReconstructionDataNurInput.py**
 Reconstructs events arrival direction. In particular it is setup with and example that takes the .root file or equivalent .nur file that contains the 2018 SPICEcore data from station 51 and stores the reconstructed angular direction in a .npy file format. Using root input file requires pyROOT to be installed. The requirement for pyROOT is being phased out of the ARIANNA data analysis, and so it recommended that instead use the .nur files which are simply conversions from .root to .nur. These .nur files do not require additional software to be installed. However it is still recommended to have ROOT installed in order to make these file conversions and have some backwards compatibility. See **writeNurFileFromRootFile.py** for a conversion script. A second script (**getAngularReconstructionDataNurInput.py**) is provided for the .nur input file type.
 
 **getElectricFieldDataAtReciever.py**
@@ -45,6 +45,9 @@ Plots the birefringence seen in the 2018 SPICEcore data from station 51.
 
 **plotExpectedEfieldVsPrecitedEfieldSpice2018.py**
 Makes the second figure shown in this ReadMe file. Plots the expected electric field over the predicted electric field for the SPICEcore data in 2019. 2019 used due to discrepancies between transmitter signal amplitudes between 2019 and 2019, and the expected electric field was given at the end of 2019.
+
+**plotGetAndSaveAnechoicDataFrom2018SPICEpulserANDAddsReconstructedPolarization.py**
+Processes and saves the anechoic chamber data for the SPICE pulser along with making comparison plots to the reconstructed polarization for the SPICE 2018 data in station 51. A lot of processing in this file.
 
 **plotPolarization.py**
 Plots the polarization data obtained from **getElectricFieldDataAtReciever.py**.

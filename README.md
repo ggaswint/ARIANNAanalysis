@@ -74,13 +74,6 @@ The ARIANNA data processing software (snowShovel) was constructed to work with R
 
 This particular sequence of commands proved successful for my Ubuntu 18.04.3 machine. Hopefully copy paste into the terminal proves successful for you as well.
 
-
-$ git clone --branch v6-22-00-patches https://github.com/root-project/root.git root_src
-$ mkdir root_build root_install && cd root_build
-$ cmake -DCMAKE_INSTALL_PREFIX=../root_install ../root_src # && check cmake configuration output for warnings or errors
-$ cmake --build . -- install -j4 # if you have 4 cores available for compilation
-$ source ../root_install/bin/thisroot.sh # or thisroot.{fish,csh}
-
 Make root folder and clone GitHub repo
 
     $ cd

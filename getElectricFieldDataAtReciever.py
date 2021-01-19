@@ -114,8 +114,8 @@ def findElectricFieldProperties(nurFile, chans, force_Polarization=False):
                 noise_idx = int(1.1*int(mid_fwhm+IW/2)) # Noise start
                 signal_idx = int(mid_fwhm+IW/2) # signal end
 
-                max_etheta = np.sqrt(np.abs(np.sum((np.abs(etheta[signal_idx-IW:signal_idx]))**2) - np.sum((np.abs(etheta[noise_idx:noise_idx+IW]))**2)))
-                max_ephi = np.sqrt(np.abs(np.sum((np.abs(ephi[signal_idx-IW:signal_idx]))**2) - np.sum((np.abs(ephi[noise_idx:noise_idx+IW]))**2)))
+                max_etheta = np.sqrt(np.abs(np.sum(etheta[signal_idx-IW:signal_idx]**2) - np.sum(etheta[noise_idx:noise_idx+IW]**2)))
+                max_ephi = np.sqrt(np.abs(np.sum(ephi[signal_idx-IW:signal_idx]**2) - np.sum(ephi[noise_idx:noise_idx+IW]**2)))
 
                 time_idx_theta = np.argmax(np.abs(h_etheta))
                 time_idx_phi = np.argmax(np.abs(h_ephi))

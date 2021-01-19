@@ -84,7 +84,7 @@ Make the build file and insure it is using python3! Note that *-DPYTHON_EXECUTAB
 
     $ cmake -DPYTHON_EXECUTABLE=/path/to/desired/python -DCMAKE_INSTALL_PREFIX=../root_install ../root_src
 
-Make build file. Note -j4 means use 4 cores for build. Should be fine.
+Make build file. Note -j4 means use 4 cores for build. This makes the build process quicker.
 
     $ cmake --build . -- install -j4
 
@@ -92,7 +92,7 @@ You need to tell the terminal about root by "sourceing" it
 
     $ source ../root_install/bin/thisroot.sh
 
-A better way would be to edit your .bashrc or .bash_profile located in the home directory. At the end of this text I give my .bashrc extra lines to be used. To test root, first simply type root in the terminal. If a root GUI pops up, then it is installed successfully. Type *.q* to quit. Who wants to use this GUI? ew. Now lets see if pyROOT is working. Make a python file and type import ROOT. Execute this with *python filename.py*. If this works then you are all set with the ROOT installation. If either of these are broken, time to google or ask someone for help or simply retry the process (I know sounds crazy but i've seen crazy things in my life).
+A better way would be to edit your .bashrc or .bash_profile located in the home directory. At the end of this text I give my .bashrc extra lines as an example. To test root, first simply type root in the terminal. If a root GUI pops up, then it is installed successfully. Type *.q* to quit. Who wants to use this GUI? ew. Now lets see if pyROOT is working. Make a python file and type import ROOT. Execute this with *python filename.py*. If this works then you are all set with the ROOT installation. If either of these are broken, time to google or ask someone for help or simply retry the process (I know sounds crazy but i've seen crazy things in my life).
 
 In the extras folder there are two files called .rootrc and .rootlogon.C. Save these files as is to your home directory. They are crucial for getting MACROS to work between ROOT and snowShovel (the final step).
 

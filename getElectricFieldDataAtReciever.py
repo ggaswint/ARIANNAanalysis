@@ -121,7 +121,7 @@ def findElectricFieldProperties(nurFile, chans, force_Polarization=False):
                 time_idx_phi = np.argmax(np.abs(h_ephi))
 
                 depths.append(depth)
-                polData.append(max_ephi/max_etheta)
+                polData.append(max_ephi/max_etheta)   # Should take np.rad2deg(np.arctan(max_ephi/max_etheta)) to get polarization angle which is then defined as 0 degrees being vertical or theta and 90 degrees being horizontal or phi. This step is done in the plotting scripts
                 ampsT.append(np.max(etheta))
                 ampsP.append(np.max(ephi))
                 EtimeT.append(e_times[time_idx_theta])

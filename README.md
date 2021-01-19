@@ -84,7 +84,7 @@ Make the build file and insure it is using python3! Note that *-DPYTHON_EXECUTAB
 
     $ cmake -DPYTHON_EXECUTABLE=/path/to/desired/python -DCMAKE_INSTALL_PREFIX=../root_install ../root_src
 
-Make build file. Note -j4 means use 4 cores for build. This makes the build process quicker.
+Compile the build file. Note -j4 means use 4 cores for build. This makes the build process quicker.
 
     $ cmake --build . -- install -j4
 

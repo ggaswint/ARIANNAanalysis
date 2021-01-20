@@ -43,6 +43,9 @@ Makes the first figure shown in this ReadMe file. Plots the delta angular direct
 **plotBirefringence.py**
 Plots the birefringence seen in the 2018 SPICEcore data from station 51.
 
+**plotColorGradientBeauty.py**
+A nice chunk of code that gets a gradient of hex color codes for plotting. Can be impressive when used to represent more information in a plot such as launch angle for ray tracing solutions. 
+
 **plotExpectedEfieldVsPrecitedEfieldSpice2018.py**
 Makes the second figure shown in this ReadMe file. Plots the expected electric field over the predicted electric field for the SPICEcore data in 2019. 2019 used due to discrepancies between transmitter signal amplitudes between 2019 and 2019, and the expected electric field was given at the end of 2019.
 
@@ -54,6 +57,9 @@ Plots the polarization data obtained from **getElectricFieldDataAtReciever.py**.
 
 **plotSpaceAngularDirectionPlusHist.py**
 Plots the delta space angular direction between true and reconstructed for the SPICE 2018 data.
+
+**plotThermalNoiseVsTemp.py**
+Plots the root mean square voltage due to thermal noise for an idealized amplifier as a function of temperature.
 
 **printStations.py**
 A way to print out some of an ARIANNA stations configuration such as antenna types and orientations.

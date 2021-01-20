@@ -1,0 +1,8 @@
+# This is the user Root initialization file. 
+Browser.Name:           TRootBrowser
+
+# Files to execute when loging on and logging off
+Rint.Logon:             ~/.rootlogon.C
+
+*.Root.MemStat          0
+*.Root.ObjectStat:      1

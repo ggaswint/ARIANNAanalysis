@@ -61,6 +61,9 @@ Plots the polarization data obtained from **getElectricFieldDataAtReciever.py**.
 **plotSpaceAngularDirectionPlusHist.py**
 Plots the delta space angular direction between true and reconstructed for the SPICE 2018 data.
 
+**plotStation51Layout.py**
+Plots a birds eye view of station 51 with axis for ice flow.
+
 **plotThermalNoiseVsTemp.py**
 Plots the root mean square voltage due to thermal noise for an idealized amplifier as a function of temperature.
 

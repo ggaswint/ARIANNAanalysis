@@ -15,7 +15,14 @@ def thermalNoisePower(temp, bandwidth):
 def thermalNoiseVrms50ohm(temp, bandwidth):
     R = 50.0 # Ohms, common impedence
     # Note some definitions remove the factor of 4, though I think this is technically wrong
-    return (4.0 * bandwidth * K_B * temp)**0.5 * units.V
+    return (4* bandwidth * K_B * temp * R)**0.5 * units.V
+
+BW = (500.0 - 50.0) * units.MHz / units.Hz
+T = 250 # Kelvin
+print("Vrms for bandwidth " + str(BW*units.Hz/units.MHz) + " MHz and temp: " + str(T) + " K is: " + str(thermalNoiseVrms50ohm(T,BW)/units.mV) + " mV")
+BW = (800.0 - 50.0) * units.MHz / units.Hz
+T = 300 # Kelvin
+print("Vrms for bandwidth " + str(BW*units.Hz/units.MHz) + " MHz and temp: " + str(T) + " K is: " + str(thermalNoiseVrms50ohm(T,BW)/units.mV) + " mV")
 
 
 temperatures = np.linspace(200,400,100) # Kelvin

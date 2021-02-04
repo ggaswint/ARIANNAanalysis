@@ -89,13 +89,13 @@ First cd into the directoy of your choice and clone this repository with:
 
 Some common python libraries are needed such as matplotlib, numpy, and scipy. These should be easy to install using pip3. Simply google install "library-name" and make sure to use pip3 to install the python3 version. You may need to first install pip3 with apt install.
 
-There is a file in this repository called **matplotlibrc** which should be copied over to *.config/matplotlib/*. This provides some basic styling features to the figures produced using matplotlib across all of your scripts such as inward facing ticks. These styles are generally preferred in scientific papers. This is not a requirement to run any of the code in this repository, however it is recommended. 
+There is a file in this repository called **matplotlibrc** which should be copied over to *.config/matplotlib/*. This provides some basic styling features to the figures produced using matplotlib across all of your scripts such as inward facing ticks. These styles are generally preferred in scientific papers. This is not a requirement to run any of the code in this repository, however it is recommended.
 
 Required packages include NuRadioReco and NuRadioMC along with all their dependencies. These two packages and a list of their required dependencies are found on GitHub at:
 https://github.com/nu-radio/NuRadioReco
 and
 https://github.com/nu-radio/NuRadioMC .
-To install, follow the instruction on the wiki page found within the ReadMe file.
+To install, follow the instruction on the wiki page found within the ReadMe file of each respective repository.
 
 The ARIANNA data is stored as ROOT files. NuRadioReco has its own file type, ".nur", along with a module to convert .root files to .nur files. If you can find and work exclusively with the .nur files then ROOT is unnecessary. The scripts below come in two versions when applicable (one version that reads .nur input files and the other for .root input files). However, I highly recommend the installation of ROOT and the other required software for ARIANNA data processing (instruction below). One reason is that the python astropy package is often being upgraded which can cause AttributeErrors when using .nur files that were produced from earlier versions of NuRadioReco. The best way to fix this is to remake the .nur files from the original .root files.
 

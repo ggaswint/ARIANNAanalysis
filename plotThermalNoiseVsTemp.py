@@ -14,8 +14,8 @@ def thermalNoisePower(temp, bandwidth):
 
 def thermalNoiseVrms50ohm(temp, bandwidth):
     R = 50.0 # Ohms, common impedence
-    # Note some definitions remove the factor of 4, though I think this is technically wrong
-    return (4* bandwidth * K_B * temp * R)**0.5 * units.V
+    # Note depending on what you are calculating, and additional factor of 4 may be included. See https://en.wikipedia.org/wiki/Johnson%E2%80%93Nyquist_noise the section on Noise Voltage and power
+    return (bandwidth * K_B * temp * R)**0.5 * units.V
 
 BW = (500.0 - 50.0) * units.MHz / units.Hz
 T = 250 # Kelvin

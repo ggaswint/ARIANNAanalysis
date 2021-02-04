@@ -34,11 +34,17 @@ A helper definition to access recalculated cable delays but looking at the avera
 **helpfulUtils.py**
 Some utility functions used by various scripts.
 
+**plotAmpResponse.py**
+Obtains from NuRadioReco and plots the ARIANNA 100, 200, and 300 series amplifier responses.
+
 **plotAngularDirectionInPolarForm.py:**
 Takes the saved .npy RF angular data from the script *getAngularReconstructionDataRootInput.py* or *getAngularReconstructionDataNurInput.py* and makes a polar plot of the reconstructed RF angular directions.
 
 **plotAngularDirectionPlusHist.py**
 Makes the first figure shown in this ReadMe file. Plots the delta angular direction between true and reconstructed for the SPICE 2018 data.
+
+**plotAntennaResponse.py**
+Obtains from NuRadioReco and plots various antenna responses. Allows for changes in the zenith and azimuth arrival direction along with the antenna model used. The example is for ARIANNA LPDA and ARIANNA Bicone antennas used in station 51 (first South Pole station).
 
 **plotAveragedEvents.py**
 Averages all events together in a root file and plots them along with an FFT.

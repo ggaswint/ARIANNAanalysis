@@ -34,6 +34,9 @@ A helper definition to access recalculated cable delays but looking at the avera
 **helpfulUtils.py**
 Some utility functions used by various scripts.
 
+**matplotlibrc**
+Nice figure setting provided by Christian Glaser. This makes all figures plotted using matplotlib have these default setting such as ticks facing inward, and grid set to True. To use this on a unix based system, copy this file to ".config/matplotlib/" which should be in your home directoy. 
+
 **plotAmpResponse.py**
 Obtains from NuRadioReco and plots the ARIANNA 100, 200, and 300 series amplifier responses.
 

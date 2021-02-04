@@ -35,7 +35,7 @@ A helper definition to access recalculated cable delays but looking at the avera
 Some utility functions used by various scripts.
 
 **matplotlibrc**
-Nice figure setting provided by Christian Glaser. This makes all figures plotted using matplotlib have these default setting such as ticks facing inward, and grid set to True. To use this on a unix based system, copy this file to ".config/matplotlib/" which should be in your home directoy. 
+Nice figure setting provided by Christian Glaser. This makes all figures plotted using matplotlib have these default setting such as ticks facing inward, and grid set to True. These settings are typically preferred in scientific papers. To use this on a unix based system, copy this file to *.config/matplotlib/* which should be in your home directoy.
 
 **plotAmpResponse.py**
 Obtains from NuRadioReco and plots the ARIANNA 100, 200, and 300 series amplifier responses.
@@ -83,6 +83,13 @@ Prints the event trigger times for each event in a calibrated root file.
 A way to print out some of an ARIANNA stations configuration such as antenna types and orientations.
 
 # Installation Instructions and Additional Requirements
+First cd into the directoy of your choice and clone this repository with:
+
+    $ git clone https://github.com/ggaswint/ARIANNAanalysis.git
+
+Some common python libraries are needed such as matplotlib, numpy, and scipy. These should be easy to install using pip3. Simply google install "library-name" and make sure to use pip3 to install the python3 version. You may need to first install pip3 with apt install.
+
+There is a file in this repository called **matplotlibrc** which should be copied over to *.config/matplotlib/*. This provides some basic styling features to the figures produced using matplotlib across all of your scripts such as inward facing ticks. These styles are generally preferred in scientific papers. This is not a requirement to run any of the code in this repository, however it is recommended. 
 
 Required packages include NuRadioReco and NuRadioMC along with all their dependencies. These two packages and a list of their required dependencies are found on GitHub at:
 https://github.com/nu-radio/NuRadioReco

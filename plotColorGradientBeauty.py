@@ -11,7 +11,6 @@ PathToARIANNAanalysis = os.environ['ARIANNAanalysis']
 # NOTE: therefor the length of colors may be smaller than numColors
 # For numColors = 1000, there are about 5 hex codes that do not have length 6 and therefor the returned array is length 995 or so
 def getColorGradient(numColors):
-    numColors = 1000
     red = Color("red")
     colorsHex = list(red.range_to(Color("purple"),numColors))
     colors = []

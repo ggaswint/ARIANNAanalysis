@@ -31,6 +31,9 @@ Same as **getElectricFieldDataAtReciever.py** except propogates electric field t
 **getInsituCableDelays.py**
 A helper definition to access recalculated cable delays but looking at the average time offset between channels in station 50 over a range of depths and after accounting for all time delays due to geometry and measured cable delays.
 
+**getLaunchAndArrivalAnglesFromSPICEwithNewTiltMeasurements2020.py**
+Performs ray tracing code and stores the receive and launch angle along with plotting them with the measured tilt profile in the SPICE hole (2020 data).
+
 **helpfulUtils.py**
 Some utility functions used by various scripts.
 
@@ -66,6 +69,9 @@ Processes and saves the anechoic chamber data for the SPICE pulser along with ma
 
 **plotPolarization.py**
 Plots the polarization data obtained from **getElectricFieldDataAtReciever.py**.
+
+**plotRayTracingSolutionSpiceStn51.py**
+Plots a side view of a few ray tracing solutions from the SPICE hole to South Pole ARIANNA station 51.
 
 **plotSpaceAngularDirectionPlusHist.py**
 Plots the delta space angular direction between true and reconstructed for the SPICE 2018 data.

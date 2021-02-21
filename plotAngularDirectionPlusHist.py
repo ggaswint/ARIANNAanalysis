@@ -84,18 +84,18 @@ fig, ax = plt.subplots(2, 1,figsize=(11, 7),sharex=True)
 fileDipoles = PathToARIANNAanalysis + '/data/reconstructedAngularDirectionFromDipoles1180mDepthAndBelowWithBandpassFilter80to300MHz.npy'
 fileLPDAs = PathToARIANNAanalysis + '/data/reconstructedAngularDirectionFromLPDAs938mDepthAndBelowWithBandpassFilter80to300MHz.npy'
 
-gg_exp_diff, gg_exp_diff2, depth = getDataDiff(fileDipoles,dataExpected)
-gg_exp_diff3, deltaAziLPDAs, depth = getDataDiff(fileLPDAs,dataExpected)
+deltaZenDipoles, deltaAziDipoles, depth = getDataDiff(fileDipoles,dataExpected)
+deltaZenLPDAs, deltaAziLPDAs, depth = getDataDiff(fileLPDAs,dataExpected)
 
-means, errors, depths = aveError(depth,gg_exp_diff)
-means2, errors2, depths2 = aveError(depth,gg_exp_diff2)
-means3, errors3, depths3 = aveError(depth,np.asarray(gg_exp_diff3).astype(float))
+means, errors, depths = aveError(depth,deltaZenDipoles)
+means2, errors2, depths2 = aveError(depth,deltaAziDipoles)
+means3, errors3, depths3 = aveError(depth,np.asarray(deltaZenLPDAs).astype(float))
 means4, errors4, depths4 = aveError(depth,np.asarray(deltaAziLPDAs).astype(float))
 
 size_marker = 40
-ax[0].scatter(depth,gg_exp_diff,s=size_marker,marker='s',color='red',alpha=0.25)
-ax[1].scatter(depth,gg_exp_diff2,s=size_marker,marker='s',color='red',alpha=0.25)
-ax[0].scatter(depth,gg_exp_diff3,s=size_marker,marker='>',color='deepskyblue',alpha=0.25)
+ax[0].scatter(depth,deltaZenDipoles,s=size_marker,marker='s',color='red',alpha=0.25)
+ax[1].scatter(depth,deltaAziDipoles,s=size_marker,marker='s',color='red',alpha=0.25)
+ax[0].scatter(depth,deltaZenLPDAs,s=size_marker,marker='>',color='deepskyblue',alpha=0.25)
 ax[1].scatter(depth,deltaAziLPDAs,s=size_marker,marker='>',color='deepskyblue',alpha=0.25)
 
 ax[0].scatter(depths,means,s=size_marker,marker='s',color='darkred',label='Dipoles ave.')
@@ -175,23 +175,23 @@ mask_lpda = (depth >= 938.0)
 
 print('stats without depth cuts:')
 print('zen: lpdas')
-textstr3 = r"$\mu$ = %.2g$^{\circ}$ +- %.2g$^{\circ}$" % (round(np.mean(gg_exp_diff3),4),round(np.std(gg_exp_diff3),4))
+textstr3 = r"$\mu$ = %.2g$^{\circ}$ +- %.2g$^{\circ}$" % (round(np.mean(deltaZenLPDAs),4),round(np.std(deltaZenLPDAs),4))
 print(textstr3)
 print('zen: dipoles')
-textstr3 = r"$\mu$ = %.2g$^{\circ}$ +- %.2g$^{\circ}$" % (round(np.mean(gg_exp_diff),4),round(np.std(gg_exp_diff),4))
+textstr3 = r"$\mu$ = %.2g$^{\circ}$ +- %.2g$^{\circ}$" % (round(np.mean(deltaZenDipoles),4),round(np.std(deltaZenDipoles),4))
 print(textstr3)
 print('azi: lpdas')
 textstr3 = r"$\mu$ = %.2g$^{\circ}$ +- %.2g$^{\circ}$" % (round(np.mean(deltaAziLPDAs),4),round(np.std(deltaAziLPDAs),4))
 print(textstr3)
 print('azi: dipoles')
-textstr3 = r"$\mu$ = %.2g$^{\circ}$ +- %.2g$^{\circ}$" % (round(np.mean(gg_exp_diff2),4),round(np.std(gg_exp_diff2),4))
+textstr3 = r"$\mu$ = %.2g$^{\circ}$ +- %.2g$^{\circ}$" % (round(np.mean(deltaAziDipoles),4),round(np.std(deltaAziDipoles),4))
 print(textstr3)
 
-gaussianHist(axHisty0,gg_exp_diff3[mask_lpda],'midnightblue',getMeanSTDStr(gg_exp_diff3[mask_lpda]),[-4.35,160],'--','lpdas')
-gaussianHist(axHisty0,gg_exp_diff[mask_dipole],'darkred',getMeanSTDStr(gg_exp_diff[mask_dipole]),[0,165],'-','dipoles')
+gaussianHist(axHisty0,deltaZenLPDAs[mask_lpda],'midnightblue',getMeanSTDStr(deltaZenLPDAs[mask_lpda]),[-4.35,160],'--','lpdas')
+gaussianHist(axHisty0,deltaZenDipoles[mask_dipole],'darkred',getMeanSTDStr(deltaZenDipoles[mask_dipole]),[0,165],'-','dipoles')
 
 gaussianHist(axHisty1,deltaAziLPDAs[mask_lpda],'midnightblue',getMeanSTDStr(deltaAziLPDAs[mask_lpda]),[0.2,150],'--','lpdas')
-gaussianHist(axHisty1,gg_exp_diff2[mask_dipole],'darkred',getMeanSTDStr(gg_exp_diff2[mask_dipole]),[-4.25,140],'-','dipoles')
+gaussianHist(axHisty1,deltaAziDipoles[mask_dipole],'darkred',getMeanSTDStr(deltaAziDipoles[mask_dipole]),[-4.25,140],'-','dipoles')
 
 ax[0].text(0.99,0.98,r'$\blacksquare$ dipoles',horizontalalignment='right',verticalalignment='top',transform=ax[0].transAxes,color='darkred')
 ax[0].text(0.99,0.90,r'$\blacktriangleright$ lpdas',horizontalalignment='right',verticalalignment='top',transform=ax[0].transAxes,color='midnightblue')

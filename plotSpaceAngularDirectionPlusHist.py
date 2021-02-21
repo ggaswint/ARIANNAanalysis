@@ -8,26 +8,6 @@ from scipy.stats import norm
 import os
 PathToARIANNAanalysis = os.environ['ARIANNAanalysis']
 
-
-cut_val = 1.49 # events larger than this uncertainty are cut for plotting purposes (outside plot limits)
-
-
-def getStartStop(depth, start_depth, end_depth, reverse=False):
-    first = True
-    second = True
-    start=0
-    end=0
-    if reverse:
-        depth = depth[::-1]
-    for i in range(len(depth)):
-        if depth[i] < end_depth and first:
-            start = i
-            first = False
-        if depth[i] < start_depth and second:
-            end = i
-            second = False
-    return start,end
-
 def angle_data(data):
     Angle = np.asarray(data)# L1 data data
     Zen = []
@@ -38,26 +18,21 @@ def angle_data(data):
         Azi.append(float(Angle[i][1]))
     return Zen, Azi
 
-def getData(file, dataE, ys, reverse=False):
+def getData(file, dataExpected, reverse=False):
     set1 = np.load(file,allow_pickle=True,encoding='bytes')
     depth = set1[0]
     data = set1[1]
     Zen, Azi = angle_data(data)
     ZenE = []
     for i in range(len(depth)):
-        idx = hu.find_nearest(np.asarray(dataE[0]), depth[i])
-        ZenE.append(ys[idx])
+        idx = hu.find_nearest(np.asarray(dataExpected[0]), depth[i])
+        ZenE.append(dataExpected[1][idx])
     return np.asarray(Zen), np.asarray(Azi), np.asarray(ZenE), np.ones(len(Azi))*312.448284, np.asarray(depth)
 
-def gaussianHist(ax,gg_exp_diff,color,label,pos,line,label2):
-    gg_exp_diff2 = []
-    for j in range(len(gg_exp_diff)):
-        if np.abs(gg_exp_diff[j]) < cut_val:
-            gg_exp_diff2.append(gg_exp_diff[j])
-
-    (mu, sigma) = norm.fit(gg_exp_diff)
+def gaussianHist(ax,data,color,label,pos,line,label2):
+    (mu, sigma) = norm.fit(data)
     fig2, ax2 = plt.subplots(1, 1)
-    n, bins, patches = ax.hist(gg_exp_diff,linestyle=line,bins=np.arange(-1.5, 3.6, 0.1),edgecolor=color,fill=False,label=label2,histtype='step',orientation='horizontal')#,weights=weights) histype = bar
+    n, bins, patches = ax.hist(data,linestyle=line,bins=np.arange(-1.5, 3.6, 0.1),edgecolor=color,fill=False,label=label2,histtype='step',orientation='horizontal')#,weights=weights) histype = bar
     if label2 == 'dipoles':
         ax.text(0.99,0.98,label,horizontalalignment='right',verticalalignment='top',transform=ax.transAxes,color='darkred')
     if label2 == 'lpdas':
@@ -67,21 +42,9 @@ def gaussianHist(ax,gg_exp_diff,color,label,pos,line,label2):
 
 # Note this is now a rayleigh distribution
 def getMeanSTDStr(data):
-    gg_exp_diff2 = []
-    for j in range(len(data)):
-        if np.abs(data[j]) < cut_val:
-            gg_exp_diff2.append(data[j])
-    #data = gg_exp_diff2
     mean = np.mean(data)
-    std = np.std(data)
-    textstr1 = r"$\mu$ = %.2g" % (mean)
-    textstr2 = r"$\sigma$ = %.2g" % (std)
-    rayleigh = np.sort(data)
-    rayleigh_std = rayleigh[int(0.68*(len(rayleigh)+1))]
-    #return [textstr1, textstr2]
-    print('sigma ' + str(stat.quantile_1d(data, np.ones_like(data), 0.68)))
-    textstr3 = r"$\mu$ = %.2g$^{\circ}$, $\sigma_{68\%%}$ = %.2g$^{\circ}$" % (mean,rayleigh_std)
-    return textstr3
+    textstr = r"$\mu$ = %.2g$^{\circ}$, $\sigma_{68\%%}$ = %.2g$^{\circ}$" % (mean,stat.quantile_1d(data, np.ones_like(data), 0.68))
+    return textstr
 
 
 def aveError(depth,data):
@@ -105,6 +68,7 @@ def get_single_angle(zenith_reco,azimuth_reco,zenith_exp,azimuth_exp):
     v2 = vspherical_to_cartesian(zenith_exp, azimuth_exp)
     return vget_angle(v1, v2)
 
+# A few depths of interest that marks when the reflection coefficient becomes 0.5 or 0.1 or is TIR
 R_50 = 937.63763764
 R_10 = 1180.98098098
 R_TIR = 918.91891892
@@ -112,8 +76,7 @@ R_TIR = 918.91891892
 
 max_diff = 10.0
 datafile = PathToARIANNAanalysis + '/data/expectedArrivalDirectionSpice2018smooth.npy'
-dataE = np.load(datafile,allow_pickle=True)
-ys = np.asarray(dataE[1])
+dataExpected = np.load(datafile,allow_pickle=True)
 
 
 fig, ax = plt.subplots(1, 1,figsize=(11, 7),sharex=True)
@@ -121,8 +84,9 @@ fig, ax = plt.subplots(1, 1,figsize=(11, 7),sharex=True)
 file = PathToARIANNAanalysis + '/data/reconstructedAngularDirectionFromDipoles1180mDepthAndBelowWithBandpassFilter80to300MHz.npy'
 file2 = PathToARIANNAanalysis + '/data/reconstructedAngularDirectionFromLPDAs938mDepthAndBelowWithBandpassFilter80to300MHz.npy'
 
-zenR_d, AziR_d, ZenE_d, AziE_d, depth_d = getData(file,dataE,ys)
-zenR_l, AziR_l, ZenE_l, AziE_l, depth_l = getData(file2,dataE,ys)
+# R for reconstructed, E for expected
+zenR_d, AziR_d, ZenE_d, AziE_d, depth_d = getData(file,dataExpected)
+zenR_l, AziR_l, ZenE_l, AziE_l, depth_l = getData(file2,dataExpected)
 
 angles_d = get_single_angle(zenR_d,AziR_d,ZenE_d,AziE_d)
 angles_l = get_single_angle(zenR_l,AziR_l,ZenE_l,AziE_l)
@@ -172,14 +136,13 @@ axHisty0 = divider.append_axes("right", 2.2, pad=0.1,sharey=ax)
 mask_dipole = (depth_d >= 1180.0)
 mask_lpda = (depth_l >= 938.0)
 
-
 print('stats without depth cuts:')
 print('Lpdas')
-textstr3 = getMeanSTDStr(angles_l)
-print(textstr3)
+textstr = getMeanSTDStr(angles_l)
+print(textstr)
 print('Dipoles')
-textstr3 = getMeanSTDStr(angles_d)
-print(textstr3)
+textstr = getMeanSTDStr(angles_d)
+print(textstr)
 
 gaussianHist(axHisty0,angles_l[mask_lpda],'midnightblue',getMeanSTDStr(angles_l[mask_lpda]),[-4.35,160],'--','lpdas')
 gaussianHist(axHisty0,angles_d[mask_dipole],'darkred',getMeanSTDStr(angles_d[mask_dipole]),[0,165],'-','dipoles')

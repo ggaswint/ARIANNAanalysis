@@ -4,29 +4,9 @@ import numpy as np
 import helpfulUtils as hu
 from mpl_toolkits.axes_grid1 import make_axes_locatable
 from scipy.stats import norm
+from radiotools import stats as stat
 import os
 PathToARIANNAanalysis = os.environ['ARIANNAanalysis']
-
-
-
-cut_val = 1.49 # events larger than this uncertainty are cut for plotting purposes (outside plot limits)
-
-
-def getStartStop(depth, start_depth, end_depth, reverse=False):
-    first = True
-    second = True
-    start=0
-    end=0
-    if reverse:
-        depth = depth[::-1]
-    for i in range(len(depth)):
-        if depth[i] < end_depth and first:
-            start = i
-            first = False
-        if depth[i] < start_depth and second:
-            end = i
-            second = False
-    return start,end
 
 def angle_data(data):
     Angle = np.asarray(data)# L1 data data
@@ -39,61 +19,43 @@ def angle_data(data):
     return Zen, Azi
 
 
-def getDataDiff(file, start_depth, stop_depth, full, dataE, ys, reverse=False):
-    set1 = np.load(file,allow_pickle=True,encoding='bytes')
-    depth = set1[0]
-    data = set1[1]
-    start, end = getStartStop(depth,start_depth,stop_depth,reverse)
-    if full:
-        start = 0
-        end = len(depth)
+def getDataDiff(file, dataExpected, reverse=False):
+    # Finds the difference between reconstructed and expected angular directions
+    # Reverse should be true if the event set is describing a pulser that was being raised versus being lowered into a borehole
+    # when full is set to true, the start and stop values are ignored and the entire depth range is taken into consideration
+    dataSet = np.load(file,allow_pickle=True,encoding='bytes')
+    depth = dataSet[0]
+    data = dataSet[1]
     Zen, Azi = angle_data(data)
-    ZenE = []
+    ZenExpected = []
     for i in range(len(depth)):
-        idx = hu.find_nearest(np.asarray(dataE[0]), depth[i])
-        ZenE.append(ys[idx])
-    gg_exp_diff = (np.asarray(Zen) - np.asarray(ZenE)).astype(float)
-    gg_exp_diff2 = (np.asarray(Azi) - 312.448284).astype(float)
-    return gg_exp_diff,gg_exp_diff2,start,end,depth
+        idx = hu.find_nearest(np.asarray(dataExpected[0]), depth[i])
+        ZenExpected.append(dataExpected[1][idx])
+    deltaZen = (np.asarray(Zen) - np.asarray(ZenExpected)).astype(float)
+    deltaAzi = (np.asarray(Azi) - 312.448284).astype(float)
+    return deltaZen,deltaAzi,depth
 
-def gaussianHist(ax,gg_exp_diff,color,label,pos,line,label2):
-    gg_exp_diff2 = []
-    for j in range(len(gg_exp_diff)):
-        if np.abs(gg_exp_diff[j]) < cut_val:
-            gg_exp_diff2.append(gg_exp_diff[j])
-
-    (mu, sigma) = norm.fit(gg_exp_diff)
-
+def gaussianHist(ax,data,color,label,pos,line,label2):
+    (mu, sigma) = norm.fit(data)
     fig2, ax2 = plt.subplots(1, 1)
-    n, bins, patches = ax.hist(gg_exp_diff,linestyle=line,bins=np.arange(-1.5, 1.6, 0.2),edgecolor=color,fill=False,label=label2,histtype='step',orientation='horizontal')#,weights=weights) histype = bar
-
+    n, bins, patches = ax.hist(data,linestyle=line,bins=np.arange(-1.5, 1.6, 0.2),edgecolor=color,fill=False,label=label2,histtype='step',orientation='horizontal')
     if label2 == 'dipoles':
         ax.text(0.99,0.98,label,horizontalalignment='right',verticalalignment='top',transform=ax.transAxes,color='darkred',fontsize=11)
-
     if label2 == 'lpdas':
         ax.text(0.99,0.90,label,horizontalalignment='right',verticalalignment='top',transform=ax.transAxes,color='midnightblue',fontsize=11)
-
     plt.close(fig2)
 
 def getMeanSTDStr(data):
-    gg_exp_diff2 = []
-    for j in range(len(data)):
-        if np.abs(data[j]) < cut_val:
-            gg_exp_diff2.append(data[j])
-    data = gg_exp_diff2
     mean = np.mean(data)
     std = np.std(data)
-    textstr1 = r"$\mu$ = %.2g" % (round(mean,2))
-    textstr2 = r"$\sigma$ = %.2g" % (round(std,2))
-    #return [textstr1, textstr2]
-    textstr3 = r"mean = %.2g$^{\circ}$, STD = %.2g$^{\circ}$" % (round(mean,2),round(std,2))
-    return textstr3
+    textstr = r"mean = %.2g$^{\circ}$, STD = %.2g$^{\circ}$" % (round(mean,2),round(std,2)) # The few outlier events make the STD much larger, changed to 68% for better measurement of error
+    tweights = np.ones_like(data)
+    textstr = r"mean = %.2g$^{\circ}$, $\sigma_{68\%%}$=%.2g$^{\circ}$" % (round(mean,2), stat.quantile_1d(data,tweights,0.68))
+    return textstr
 
 
 def aveError(depth,data):
-    depth = np.asarray(depth)
     depth = np.round(depth.astype(float), -1)
-    #depth = np.unique(np.round(depth.astype(float), -1))
     means = []
     stds = []
     depths = []
@@ -105,37 +67,36 @@ def aveError(depth,data):
     return means, stds, depths
 
 
+# A few depths of interest that marks when the reflection coefficient becomes 0.5 or 0.1 or is TIR
 R_50 = 937.63763764
 R_10 = 1180.98098098
 R_TIR = 918.91891892
 
 
 color = ['C1','C2','C3','C4','C5','C6','C7','C8']
-max_diff = 10.0
 datafile = PathToARIANNAanalysis + '/data/expectedArrivalDirectionSpice2018smooth.npy'
-dataE = np.load(datafile,allow_pickle=True)
-ys = np.asarray(dataE[1])
+dataExpected = np.load(datafile,allow_pickle=True)
 
 
 fig, ax = plt.subplots(2, 1,figsize=(11, 7),sharex=True)
 
 
-file = PathToARIANNAanalysis + '/data/reconstructedAngularDirectionFromDipoles1180mDepthAndBelowWithBandpassFilter80to300MHz.npy'
-file2 = PathToARIANNAanalysis + '/data/reconstructedAngularDirectionFromLPDAs938mDepthAndBelowWithBandpassFilter80to300MHz.npy'
+fileDipoles = PathToARIANNAanalysis + '/data/reconstructedAngularDirectionFromDipoles1180mDepthAndBelowWithBandpassFilter80to300MHz.npy'
+fileLPDAs = PathToARIANNAanalysis + '/data/reconstructedAngularDirectionFromLPDAs938mDepthAndBelowWithBandpassFilter80to300MHz.npy'
 
-gg_exp_diff, gg_exp_diff2, start, end, depth = getDataDiff(file,500,1400,False,dataE,ys)
-gg_exp_diff3, gg_exp_diff4, start, end, depth = getDataDiff(file2,1000,1800,False,dataE,ys)
+gg_exp_diff, gg_exp_diff2, depth = getDataDiff(fileDipoles,dataExpected)
+gg_exp_diff3, deltaAziLPDAs, depth = getDataDiff(fileLPDAs,dataExpected)
 
 means, errors, depths = aveError(depth,gg_exp_diff)
 means2, errors2, depths2 = aveError(depth,gg_exp_diff2)
 means3, errors3, depths3 = aveError(depth,np.asarray(gg_exp_diff3).astype(float))
-means4, errors4, depths4 = aveError(depth,np.asarray(gg_exp_diff4).astype(float))
+means4, errors4, depths4 = aveError(depth,np.asarray(deltaAziLPDAs).astype(float))
 
 size_marker = 40
 ax[0].scatter(depth,gg_exp_diff,s=size_marker,marker='s',color='red',alpha=0.25)
 ax[1].scatter(depth,gg_exp_diff2,s=size_marker,marker='s',color='red',alpha=0.25)
 ax[0].scatter(depth,gg_exp_diff3,s=size_marker,marker='>',color='deepskyblue',alpha=0.25)
-ax[1].scatter(depth,gg_exp_diff4,s=size_marker,marker='>',color='deepskyblue',alpha=0.25)
+ax[1].scatter(depth,deltaAziLPDAs,s=size_marker,marker='>',color='deepskyblue',alpha=0.25)
 
 ax[0].scatter(depths,means,s=size_marker,marker='s',color='darkred',label='Dipoles ave.')
 ax[1].scatter(depths2,means2,s=size_marker,marker='s',color='darkred',label='Dipoles ave.')
@@ -220,7 +181,7 @@ print('zen: dipoles')
 textstr3 = r"$\mu$ = %.2g$^{\circ}$ +- %.2g$^{\circ}$" % (round(np.mean(gg_exp_diff),4),round(np.std(gg_exp_diff),4))
 print(textstr3)
 print('azi: lpdas')
-textstr3 = r"$\mu$ = %.2g$^{\circ}$ +- %.2g$^{\circ}$" % (round(np.mean(gg_exp_diff4),4),round(np.std(gg_exp_diff4),4))
+textstr3 = r"$\mu$ = %.2g$^{\circ}$ +- %.2g$^{\circ}$" % (round(np.mean(deltaAziLPDAs),4),round(np.std(deltaAziLPDAs),4))
 print(textstr3)
 print('azi: dipoles')
 textstr3 = r"$\mu$ = %.2g$^{\circ}$ +- %.2g$^{\circ}$" % (round(np.mean(gg_exp_diff2),4),round(np.std(gg_exp_diff2),4))
@@ -229,7 +190,7 @@ print(textstr3)
 gaussianHist(axHisty0,gg_exp_diff3[mask_lpda],'midnightblue',getMeanSTDStr(gg_exp_diff3[mask_lpda]),[-4.35,160],'--','lpdas')
 gaussianHist(axHisty0,gg_exp_diff[mask_dipole],'darkred',getMeanSTDStr(gg_exp_diff[mask_dipole]),[0,165],'-','dipoles')
 
-gaussianHist(axHisty1,gg_exp_diff4[mask_lpda],'midnightblue',getMeanSTDStr(gg_exp_diff4[mask_lpda]),[0.2,150],'--','lpdas')
+gaussianHist(axHisty1,deltaAziLPDAs[mask_lpda],'midnightblue',getMeanSTDStr(deltaAziLPDAs[mask_lpda]),[0.2,150],'--','lpdas')
 gaussianHist(axHisty1,gg_exp_diff2[mask_dipole],'darkred',getMeanSTDStr(gg_exp_diff2[mask_dipole]),[-4.25,140],'-','dipoles')
 
 ax[0].text(0.99,0.98,r'$\blacksquare$ dipoles',horizontalalignment='right',verticalalignment='top',transform=ax[0].transAxes,color='darkred')

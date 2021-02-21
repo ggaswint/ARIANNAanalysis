@@ -11,6 +11,7 @@ import NuRadioReco.modules.correlationDirectionFitter
 from NuRadioReco.framework.parameters import stationParameters as stnp
 from NuRadioReco.modules.io import NuRadioRecoio
 import numpy as np
+from scipy.interpolate import interp1d
 import os
 PathToARIANNAanalysis = os.environ['ARIANNAanalysis']
 
@@ -35,15 +36,30 @@ cTW.begin(debug=False)
 #det = detector_sys_uncertainties.DetectorSysUncertainties(source='sql',assume_inf=False)
 det = detector.Detector(source='sql',assume_inf=False)
 
+expData = np.load(PathToARIANNAanalysis + '/data/dec30_timeVSdepth.npy')
+timesRun = expData[0]
+depthsRun = expData[1]
+f_data = interp1d(timesRun, depthsRun)
+
+def getDepthsDec30SPICErun(time):
+    # convert time to a hour unit for comparing with SPICE run time stamps
+	time = str(time)[11:]
+	time_fixed = (int(time[:2]) + int(time[3:5])/60.0 + int(time[6:8])/3600.0)
+	if time_fixed < 10: # Times on the 31st of December are written as hours greater than 24
+		time_fixed += 24.0
+	return -float(f_data(time_fixed))
+
 def getAngularData(nurFile,channel_pairs):
     template = NuRadioRecoio.NuRadioRecoio(nurFile)
     direction_plot = []
     times = []
+    depths = []
     for evt in template.get_events():
         for station in evt.get_stations():
             time = station.get_station_time()
             if station.has_triggered():
                 det.update(station.get_station_time())
+                depths.append(float(getDepthsDec30SPICErun(station.get_station_time())))
                 station.set_is_neutrino()
                 l1s = []
                 channelStopFilter.run(evt,station,det)
@@ -53,22 +69,26 @@ def getAngularData(nurFile,channel_pairs):
                 channelSignalReconstructor.run(evt,station,det)
                 channelResampler.run(evt, station, det, sampling_rate=50*units.GHz)
                 cTW.run(evt, station, det, window_function='hanning')
+                # Uncomment below to add more precision to the cable delays from the SPICE data
+				#time_offsets = [-1.3367996742671011,-0.7025223759153785,-0.1587785016286645,0.0,0.22120196238757153,-0.06695943120033458,0.0,-0.935954487989886] # calculated additional cable delays found from SPICE data using getInsituCableDelays.py
+				#for channel in station.iter_channels():
+				#   channel.set_trace_start_time(channel.get_trace_start_time()-time_offsets[channel.get_id()])
                 correclationDirectionFitter.run(evt,station,det,n_index=1.353,AziLim=[309 * units.deg, 315 * units.deg],ZenLim=[120 * units.deg, 160 * units.deg],channel_pairs=channel_pairs)  #AziLim=[309 * units.deg, 315 * units.deg]
                 times.append(time)
                 direction_plot.append([station.get_parameter(stnp.zenith)/units.deg,station.get_parameter(stnp.azimuth)/units.deg])
                 channelResampler.run(evt, station, det, sampling_rate=1*units.GHz)
                 print("Reconstructed Angular Directions: " + str([station.get_parameter(stnp.zenith)/units.deg,station.get_parameter(stnp.azimuth)/units.deg]))
-    return times, direction_plot
+    return depths, direction_plot, times
 
 def main():
 
     file = PathToARIANNAanalysis + '/data/Spice_750mDown_Dec30_2018_idl_10dB.nur'
 
-    times, angles = getAngularData(file,((0, 2), (1, 3)))
-    np.save(PathToARIANNAanalysis + '/data/cc_lpdas_stn51',[times,angles])
+    depths, direction_plot, times = getAngularData(file,((0, 2), (1, 3)))
+    np.save(PathToARIANNAanalysis + '/data/cc_lpdas_stn51',[depths, direction_plot, times])
 
-    times, angles = getAngularData(file,((4, 6), (5, 7)))
-    np.save(PathToARIANNAanalysis + '/data/cc_dipoles_stn51',[times,angles])
+    depths, direction_plot, times = getAngularData(file,((4, 6), (5, 7)))
+    np.save(PathToARIANNAanalysis + '/data/cc_dipoles_stn51',[depths, direction_plot, times])
 
 
 if __name__== "__main__":

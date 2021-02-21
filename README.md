@@ -88,6 +88,13 @@ Prints the event trigger times for each event in a calibrated root file.
 **printStations.py**
 A way to print out some of an ARIANNA stations configuration such as antenna types and orientations.
 
+**produceNeutrinoDataSet.py**
+Simulates and stores a set of neutrinos in ice with a specified volume and range of energies.
+
+**simulateNeutrinoEventDetection.py**
+Simulates the propagation, triggering, and convolution with detector of a neutrino data set produced from **produceNeutrinoDataSet.py**. Is currently setup to run with an ARIANNA 5 channel station (4 LPDAs and 1 central dipole). The station configuration has 10 channels, each channel is duplicated. This is so that the duplicated channels can be acted as a narrow band channel and perform the triggering mechanisms. The analysis channels are the first five. This is to simulate future on board electronics for a narrow band trigger. Note that this script requires some input arguments. See the commented line at the end of this script for an example command to run.
+
+
 # Installation Instructions and Additional Requirements
 First cd into the directoy of your choice and clone this repository with:
 

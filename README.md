@@ -67,6 +67,9 @@ Makes the second figure shown in this ReadMe file. Plots the expected electric f
 **plotGetAndSaveAnechoicDataFrom2018SPICEpulserANDAddsReconstructedPolarization.py**
 Processes and saves the anechoic chamber data for the SPICE pulser along with making comparison plots to the reconstructed polarization for the SPICE 2018 data in station 51. A lot of processing in this file.
 
+**plotNeutrinoReconstructionData.py**
+Plots the neutrino reconstruction data that is saved from the driver script **runNeutrinoReconstruction.py**.
+
 **plotPolarization.py**
 Plots the polarization data obtained from **getElectricFieldDataAtReciever.py**.
 
@@ -91,9 +94,14 @@ A way to print out some of an ARIANNA stations configuration such as antenna typ
 **produceNeutrinoDataSet.py**
 Simulates and stores a set of neutrinos in ice with a specified volume and range of energies.
 
-**simulateNeutrinoEventDetection.py**
-Simulates the propagation, triggering, and convolution with detector of a neutrino data set produced from **produceNeutrinoDataSet.py**. Is currently setup to run with an ARIANNA 5 channel station (4 LPDAs and 1 central dipole). The station configuration has 10 channels, each channel is duplicated. This is so that the duplicated channels can be acted as a narrow band channel and perform the triggering mechanisms. The analysis channels are the first five. This is to simulate future on board electronics for a narrow band trigger. Note that this script requires some input arguments. See the commented line at the end of this script for an example command to run.
+**runNeutrinoReconstruction.py**
+Driver script for reconstructing the neutrino direction and energy. It is currently setup to use the simulated data produced from **simulateNeutrinoEventDetection.py**.
 
+**simulateNeutrinoEventDetection.py**
+Simulates the propagation, triggering, and convolution with detector of a neutrino data set produced from **produceNeutrinoDataSet.py**. Is currently setup to run with an ARIANNA 5 channel station (4 LPDAs and 1 central dipole). The station configuration has 10 channels, each channel is duplicated. This is so that the duplicated channels can be acted as a narrow band channel and perform the triggering mechanisms. The analysis channels are the first five. This is one way to simulate future plans for on board electronics of a narrow band trigger. Note that this script requires some input arguments. See the commented line at the end of this script for an example command to run.
+
+**voltageToEfieldAnalyticConverterForNeutrinos.py**
+Performs the neutrino direction and energy reconstruction. Will be adapted into NuRadioReco, but this serves as a template for that module until the adaptation is completed.
 
 # Installation Instructions and Additional Requirements
 First cd into the directoy of your choice and clone this repository with:

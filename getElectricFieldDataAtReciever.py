@@ -104,18 +104,18 @@ def findElectricFieldProperties(nurFile, chans, force_Polarization=False):
                 etheta = station.get_electric_fields()[0].get_trace()[1]
                 ephi = station.get_electric_fields()[0].get_trace()[2]
                 e_times = station.get_electric_fields()[0].get_times()
-                h_etheta = hilbert(station.get_electric_fields()[0].get_trace()[1])
-                h_ephi = hilbert(station.get_electric_fields()[0].get_trace()[2])
-                h3 = np.sqrt(np.abs(h_etheta)**2 + np.abs(h_ephi)**2)
-                fwhm = hp.get_FWHM_hilbert(h3)
+                h_etheta = hilbert(etheta)
+                h_ephi = hilbert(ephi)
+                h2 = np.sqrt(np.abs(h_etheta)**2 + np.abs(h_ephi)**2)
+                fwhm = hp.get_FWHM_hilbert(h2)
 
                 IW = int(sampling_rate*70.0) # length of window
                 mid_fwhm = fwhm[0] + int((fwhm[1] - fwhm[0])/2) # Center of FWHM
                 noise_idx = int(1.1*int(mid_fwhm+IW/2)) # Noise start
                 signal_idx = int(mid_fwhm+IW/2) # signal end
 
-                max_etheta = np.sqrt(np.abs(np.sum(etheta[signal_idx-IW:signal_idx]**2) - np.sum(etheta[noise_idx:noise_idx+IW]**2)))
-                max_ephi = np.sqrt(np.abs(np.sum(ephi[signal_idx-IW:signal_idx]**2) - np.sum(ephi[noise_idx:noise_idx+IW]**2)))
+                max_etheta = np.sqrt(np.sum(etheta[signal_idx-IW:signal_idx]**2) - np.sum(etheta[noise_idx:noise_idx+IW]**2))
+                max_ephi = np.sqrt(np.sum(ephi[signal_idx-IW:signal_idx]**2) - np.sum(ephi[noise_idx:noise_idx+IW]**2))
 
                 time_idx_theta = np.argmax(np.abs(h_etheta))
                 time_idx_phi = np.argmax(np.abs(h_ephi))

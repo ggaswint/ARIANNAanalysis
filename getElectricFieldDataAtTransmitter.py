@@ -58,121 +58,121 @@ f_data = interp1d(timesRun, depthsRun)
 
 #converts time stamp to fractional hour so can be used to acces what the depth of the pulser was per second.
 def getDepthsFromTimes(time):
-    depth = 0
-    time = str(time)[11:]
-    time_fixed = (int(time[:2]) + int(time[3:5])/60.0 + int(time[6:8])/3600.0)
-    if time_fixed < 10:
-        time_fixed += 24.0
-    return -float(f_data(time_fixed))
+	depth = 0
+	time = str(time)[11:]
+	time_fixed = (int(time[:2]) + int(time[3:5])/60.0 + int(time[6:8])/3600.0)
+	if time_fixed < 10:
+		time_fixed += 24.0
+	return -float(f_data(time_fixed))
 
 def findElectricFieldProperties(nurFile, chans, force_Polarization=False):
-    template = NuRadioRecoio.NuRadioRecoio(nurFile)
-    event_count = 0
-    polData = []
-    depths = []
-    ampsT = []
-    ampsP = []
-    EtimeT = []
-    EtimeP = []
-    lower = 80 # Filter MHz
-    upper = 300 # Filter MHz
-    for evt in template.get_events():
-        for station in evt.get_stations():
-            depth = getDepthsFromTimes(station.get_station_time())
-            if station.has_triggered():# and bad_event not in [721,722,725,2002,2143,2367]:
-                det.update(station.get_station_time())
-                station.set_is_neutrino()
-                channelStopFilter.run(evt,station,det)
-                channelBandPassFilter.run(evt, station, det, passband=[lower * units.MHz, upper * units.MHz], filter_type='rectangular')
-                hardwareResponseIncorporator.run(evt, station, det, sim_to_data=False)
-                channelSignalReconstructor.run(evt,station,det)
-                channelResampler.run(evt, station, det, sampling_rate=50*units.GHz)
-                Zen, Azi = np.asarray(getAngles.findZenAziFromSpiceDataLPDAs(depth)[3])*units.deg
-                station.set_parameter(stnp.zenith,Zen)
-                station.set_parameter(stnp.azimuth,Azi)
-                sampling_rate = station.get_channel(0).get_sampling_rate()
-                #cTW.run(evt, station, det, window_function='hanning')
+	template = NuRadioRecoio.NuRadioRecoio(nurFile)
+	event_count = 0
+	polData = []
+	depths = []
+	ampsT = []
+	ampsP = []
+	EtimeT = []
+	EtimeP = []
+	lower = 80 # Filter MHz
+	upper = 300 # Filter MHz
+	for evt in template.get_events():
+		for station in evt.get_stations():
+			depth = getDepthsFromTimes(station.get_station_time())
+			if station.has_triggered():# and bad_event not in [721,722,725,2002,2143,2367]:
+				det.update(station.get_station_time())
+				station.set_is_neutrino()
+				channelStopFilter.run(evt,station,det)
+				channelBandPassFilter.run(evt, station, det, passband=[lower * units.MHz, upper * units.MHz], filter_type='rectangular')
+				hardwareResponseIncorporator.run(evt, station, det, sim_to_data=False)
+				channelSignalReconstructor.run(evt,station,det)
+				channelResampler.run(evt, station, det, sampling_rate=50*units.GHz)
+				Zen, Azi = np.asarray(getAngles.findZenAziFromSpiceDataLPDAs(depth)[3])*units.deg
+				station.set_parameter(stnp.zenith,Zen)
+				station.set_parameter(stnp.azimuth,Azi)
+				sampling_rate = station.get_channel(0).get_sampling_rate()
+				#cTW.run(evt, station, det, window_function='hanning')
 
-                # time delays between channels
-                time_offsets = getTimeDelays.getAdditionalInsituCableDelaysFromSpice()
-                for channel in station.iter_channels():
-                    channel.set_trace_start_time(channel.get_trace_start_time()-time_offsets[channel.get_id()])
-
-
-                voltageToEfieldConverter.run(evt, station, det, use_channels=chans, force_Polarization=force_Polarization)
-                electricFieldBandPassFilter.run(evt, station, det, passband=[lower * units.MHz, upper * units.MHz], filter_type='rectangular')
+				# time delays between channels
+				time_offsets = getTimeDelays.getAdditionalInsituCableDelaysFromSpice()
+				for channel in station.iter_channels():
+					channel.set_trace_start_time(channel.get_trace_start_time()-time_offsets[channel.get_id()])
 
 
-                #### frequency dependent attenuation due to propogation through the ice. Can be verified and cleaned up.
-                # A lot of this is dealing with NuRadioMC ray tracing, if not familiar start with some of those examples in ARIANNAanalysis
-                ice = medium.southpole_simple()
-                z_0 = 80.0
-                delta_n = 1.78-1.353
-                ice.z_0 = z_0
-                ice.delta_n = delta_n
-                ice.n_ice = 1.78
-                r = ray.ray_tracing_2D(ice)
-                x1 = [-653.8 * units.m, -depth * units.m]  # SPICE at 800m
-                x2 = [0.* units.m, -1.0* units.m]  # ARA antanna
-                solution = r.find_solutions(x1, x2)
-                C_0 = solution[0]['C0']
-                max_detector_freq = 0.5*units.GHz
-                freq = station.get_electric_fields()[0].get_frequencies()
-                att = r.get_attenuation_along_path(x1, x2, C_0, freq, max_detector_freq)
-                spectrum = station.get_electric_fields()[0].get_frequency_spectrum()
-                newSpectrum = spectrum/att
-                freq_mask = freq > upper*units.MHz
-                newSpectrum[0][freq_mask] = 0
-                newSpectrum[1][freq_mask] = 0
-                newSpectrum[2][freq_mask] = 0
-                freq_mask = freq < lower*units.MHz
-                newSpectrum[0][freq_mask] = 0
-                newSpectrum[1][freq_mask] = 0
-                newSpectrum[2][freq_mask] = 0
-                station.get_electric_fields()[0].set_frequency_spectrum(newSpectrum, sampling_rate)
+				voltageToEfieldConverter.run(evt, station, det, use_channels=chans, force_Polarization=force_Polarization)
+				electricFieldBandPassFilter.run(evt, station, det, passband=[lower * units.MHz, upper * units.MHz], filter_type='rectangular')
 
 
-                etheta = station.get_electric_fields()[0].get_trace()[1]
-                ephi = station.get_electric_fields()[0].get_trace()[2]
-                e_times = station.get_electric_fields()[0].get_times()
-                h_etheta = hilbert(station.get_electric_fields()[0].get_trace()[1])
-                h_ephi = hilbert(station.get_electric_fields()[0].get_trace()[2])
-                h3 = np.sqrt(np.abs(h_etheta)**2 + np.abs(h_ephi)**2)
-                fwhm = hp.get_FWHM_hilbert(h3)
+				#### frequency dependent attenuation due to propogation through the ice. Can be verified and cleaned up.
+				# A lot of this is dealing with NuRadioMC ray tracing, if not familiar start with some of those examples in ARIANNAanalysis
+				ice = medium.southpole_simple()
+				z_0 = 80.0
+				delta_n = 1.78-1.353
+				ice.z_0 = z_0
+				ice.delta_n = delta_n
+				ice.n_ice = 1.78
+				r = ray.ray_tracing_2D(ice)
+				x1 = [-653.8 * units.m, -depth * units.m]  # SPICE at 800m
+				x2 = [0.* units.m, -1.0* units.m]  # ARA antanna
+				solution = r.find_solutions(x1, x2)
+				C_0 = solution[0]['C0']
+				max_detector_freq = 0.5*units.GHz
+				freq = station.get_electric_fields()[0].get_frequencies()
+				att = r.get_attenuation_along_path(x1, x2, C_0, freq, max_detector_freq)
+				spectrum = station.get_electric_fields()[0].get_frequency_spectrum()
+				newSpectrum = spectrum/att
+				freq_mask = freq > upper*units.MHz
+				newSpectrum[0][freq_mask] = 0
+				newSpectrum[1][freq_mask] = 0
+				newSpectrum[2][freq_mask] = 0
+				freq_mask = freq < lower*units.MHz
+				newSpectrum[0][freq_mask] = 0
+				newSpectrum[1][freq_mask] = 0
+				newSpectrum[2][freq_mask] = 0
+				station.get_electric_fields()[0].set_frequency_spectrum(newSpectrum, sampling_rate)
 
-                IW = int(sampling_rate*70.0) # length of window
-                mid_fwhm = fwhm[0] + int((fwhm[1] - fwhm[0])/2) # Center of FWHM
-                noise_idx = int(1.1*int(mid_fwhm+IW/2)) # Noise start
-                signal_idx = int(mid_fwhm+IW/2) # signal end
-                max_etheta = np.sqrt(np.abs(np.sum(etheta[signal_idx-IW:signal_idx]**2) - np.sum(etheta[noise_idx:noise_idx+IW]**2)))
-                max_ephi = np.sqrt(np.abs(np.sum(ephi[signal_idx-IW:signal_idx]**2) - np.sum(ephi[noise_idx:noise_idx+IW]**2)))
 
-                time_idx_theta = np.argmax(np.abs(h_etheta))
-                time_idx_phi = np.argmax(np.abs(h_ephi))
+				etheta = station.get_electric_fields()[0].get_trace()[1]
+				ephi = station.get_electric_fields()[0].get_trace()[2]
+				e_times = station.get_electric_fields()[0].get_times()
+				h_etheta = hilbert(etheta)
+				h_ephi = hilbert(ephi)
+				h2 = np.sqrt(h_etheta**2 + h_ephi**2)
+				fwhm = hp.get_FWHM_hilbert(h2)
 
-                depths.append(depth)
-                polData.append(max_ephi/max_etheta)    # Should take np.rad2deg(np.arctan(max_ephi/max_etheta)) to get polarization angle which is then defined as 0 degrees being vertical or theta and 90 degrees being horizontal or phi. This step is done in the plotting scripts
-                ampsT.append(np.max(etheta))
-                ampsP.append(np.max(ephi))
-                EtimeT.append(e_times[time_idx_theta])
-                EtimeP.append(e_times[time_idx_phi])
+				IW = int(sampling_rate*70.0) # length of window
+				mid_fwhm = fwhm[0] + int((fwhm[1] - fwhm[0])/2) # Center of FWHM
+				noise_idx = int(1.1*int(mid_fwhm+IW/2)) # Noise start
+				signal_idx = int(mid_fwhm+IW/2) # signal end
+				max_etheta = np.sqrt(np.abs(np.sum(etheta[signal_idx-IW:signal_idx]**2) - np.sum(etheta[noise_idx:noise_idx+IW]**2)))
+				max_ephi = np.sqrt(np.abs(np.sum(ephi[signal_idx-IW:signal_idx]**2) - np.sum(ephi[noise_idx:noise_idx+IW]**2)))
 
-                channelResampler.run(evt, station, det, sampling_rate=1*units.GHz)
-            event_count += 1
+				time_idx_theta = np.argmax(np.abs(h_etheta))
+				time_idx_phi = np.argmax(np.abs(h_ephi))
 
-    return depths, polData, ampsT, ampsP, EtimeT, EtimeP
+				depths.append(depth)
+				polData.append(max_ephi/max_etheta)    # Should take np.rad2deg(np.arctan(max_ephi/max_etheta)) to get polarization angle which is then defined as 0 degrees being vertical or theta and 90 degrees being horizontal or phi. This step is done in the plotting scripts
+				ampsT.append(np.max(etheta))
+				ampsP.append(np.max(ephi))
+				EtimeT.append(e_times[time_idx_theta])
+				EtimeP.append(e_times[time_idx_phi])
+
+				channelResampler.run(evt, station, det, sampling_rate=1*units.GHz)
+			event_count += 1
+
+	return depths, polData, ampsT, ampsP, EtimeT, EtimeP
 
 def main():
-    print('Please replace file from below to the data you would like to analyze')
-    file = PathToARIANNAanalysis + '/data/Spice_750mDown_Dec30_2018_idl_10dB.nur'
-    print(file)
+	print('Please replace file from below to the data you would like to analyze')
+	file = PathToARIANNAanalysis + '/data/Spice_750mDown_Dec30_2018_idl_10dB.nur'
+	print(file)
 
-    depths, polData, ampsT, ampsP, EtimeT, EtimeP = findElectricFieldProperties(file, [0,1,2,3])
-    np.save(PathToARIANNAanalysis + '/data/SPICE_Dec30_2018_EFieldDataLPDA_AtTransmitter',[depths, polData, ampsT, ampsP, EtimeT, EtimeP])
+	depths, polData, ampsT, ampsP, EtimeT, EtimeP = findElectricFieldProperties(file, [0,1,2,3])
+	np.save(PathToARIANNAanalysis + '/data/SPICE_Dec30_2018_EFieldDataLPDA_AtTransmitter',[depths, polData, ampsT, ampsP, EtimeT, EtimeP])
 
-    #depths, polData, ampsT, ampsP, EtimeT, EtimeP = findElectricFieldProperties(file, [4,5,6,7],'eTheta')
-    #np.save(PathToARIANNAanalysis + '/data/SPICE_Dec30_2018_EFieldDataDipole',[depths, polData, ampsT, ampsP, EtimeT, EtimeP])
+	#depths, polData, ampsT, ampsP, EtimeT, EtimeP = findElectricFieldProperties(file, [4,5,6,7],'eTheta')
+	#np.save(PathToARIANNAanalysis + '/data/SPICE_Dec30_2018_EFieldDataDipole',[depths, polData, ampsT, ampsP, EtimeT, EtimeP])
 
 
 if __name__== "__main__":
-    main()
+	main()

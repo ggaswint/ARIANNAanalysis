@@ -8,6 +8,8 @@ from radiotools import stats as stat
 import os
 PathToARIANNAanalysis = os.environ['ARIANNAanalysis']
 
+expectedAzi = 312.448284
+
 def angle_data(data):
     Angle = np.asarray(data)# L1 data data
     Zen = []
@@ -28,11 +30,13 @@ def getDataDiff(file, dataExpected, reverse=False):
     data = dataSet[1]
     Zen, Azi = angle_data(data)
     ZenExpected = []
+    AziExpected = []
     for i in range(len(depth)):
         idx = hu.find_nearest(np.asarray(dataExpected[0]), depth[i])
         ZenExpected.append(dataExpected[1][idx])
+        AziExpected.append(dataExpected[2][idx])
     deltaZen = (np.asarray(Zen) - np.asarray(ZenExpected)).astype(float)
-    deltaAzi = (np.asarray(Azi) - 312.448284).astype(float)
+    deltaAzi = (np.asarray(Azi) - np.asarray(AziExpected)).astype(float)
     return deltaZen,deltaAzi,depth
 
 def gaussianHist(ax,data,color,label,pos,line,label2):
@@ -51,6 +55,13 @@ def getMeanSTDStr(data):
     textstr = r"mean = %.2g$^{\circ}$, STD = %.2g$^{\circ}$" % (round(mean,2),round(std,2)) # The few outlier events make the STD much larger, changed to 68% for better measurement of error
     tweights = np.ones_like(data)
     textstr = r"mean = %.2g$^{\circ}$, $\sigma_{68\%%}$=%.2g$^{\circ}$" % (round(mean,2), stat.quantile_1d(data,tweights,0.68))
+
+    tweights = np.ones_like(data)
+    q1 = stat.quantile_1d(data, tweights, 0.16)
+    q2 = stat.quantile_1d(data, tweights, 0.84)
+    median = stat.median(data, tweights)
+    textstr = "$\mathrm{median}:%.2g^{+%.2g}_{-%.2g}$" % (round(median,2), np.abs(median - q2),np.abs(median - q1))
+
     return textstr
 
 
@@ -76,7 +87,30 @@ R_TIR = 918.91891892
 color = ['C1','C2','C3','C4','C5','C6','C7','C8']
 datafile = PathToARIANNAanalysis + '/data/expectedArrivalDirectionSpice2018smooth.npy'
 dataExpected = np.load(datafile,allow_pickle=True)
+tmpAzi = []
+for i in range(len(dataExpected[0])):
+    tmpAzi.append(expectedAzi)
+dataExpected = np.asarray([dataExpected[0],dataExpected[1],np.asarray(tmpAzi)])
 
+correctForTilt = True
+if correctForTilt:
+    import getLaunchAndArrivalAnglesFromSPICEwithNewTiltMeasurements2020 as tilt2020
+
+    zen, azi, depths2 = tilt2020.getOffsetForAngularData()
+    fig4, ax4 = plt.subplots(1, 1)
+    ax4.plot(depths2, zen,linewidth=3,linestyle='solid',label='zenith')
+    ax4.plot(depths2, azi,linewidth=2,linestyle='dotted',label='azimuth')
+    ax4.legend()
+    ax4.set_xlabel(r'Z [m]')
+    ax4.set_ylabel(r'$\Delta$ receive azimuth from no tilt [$^{\circ}$]')
+    ax4.set_xlim(980,1700.0)
+    fig4.tight_layout()
+    fig4.savefig(PathToARIANNAanalysis + '/plots/changeInRecieveAngleFor2020TiltProfile.png')
+    fig4.savefig(PathToARIANNAanalysis + '/plots/changeInRecieveAngleFor2020TiltProfile.pdf')
+    for i in range(len(dataExpected[0])):
+        idx = hu.find_nearest(depths2, dataExpected[0][i])
+        dataExpected[1][i] += zen[idx]
+        dataExpected[2][i] += azi[idx]
 
 fig, ax = plt.subplots(2, 1,figsize=(11, 7),sharex=True)
 
@@ -211,5 +245,7 @@ save = PathToARIANNAanalysis + '/plots/angularSpiceData.pdf'
 fig.savefig(save)
 save = PathToARIANNAanalysis + '/plots/angularSpiceData.png'
 fig.savefig(save)
+
+
 
 plt.show()

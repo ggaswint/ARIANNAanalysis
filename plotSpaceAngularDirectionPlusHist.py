@@ -8,6 +8,8 @@ from scipy.stats import norm
 import os
 PathToARIANNAanalysis = os.environ['ARIANNAanalysis']
 
+expectedAzi = 312.448284
+
 def angle_data(data):
     Angle = np.asarray(data)# L1 data data
     Zen = []
@@ -24,10 +26,12 @@ def getData(file, dataExpected, reverse=False):
     data = set1[1]
     Zen, Azi = angle_data(data)
     ZenE = []
+    AziE = []
     for i in range(len(depth)):
         idx = hu.find_nearest(np.asarray(dataExpected[0]), depth[i])
         ZenE.append(dataExpected[1][idx])
-    return np.asarray(Zen), np.asarray(Azi), np.asarray(ZenE), np.ones(len(Azi))*312.448284, np.asarray(depth)
+        AziE.append(dataExpected[2][idx])
+    return np.asarray(Zen), np.asarray(Azi), np.asarray(ZenE), np.asarray(AziE), np.asarray(depth)
 
 def gaussianHist(ax,data,color,label,pos,line,label2):
     (mu, sigma) = norm.fit(data)
@@ -77,7 +81,30 @@ R_TIR = 918.91891892
 max_diff = 10.0
 datafile = PathToARIANNAanalysis + '/data/expectedArrivalDirectionSpice2018smooth.npy'
 dataExpected = np.load(datafile,allow_pickle=True)
+tmpAzi = []
+for i in range(len(dataExpected[0])):
+    tmpAzi.append(expectedAzi)
+dataExpected = np.asarray([dataExpected[0],dataExpected[1],np.asarray(tmpAzi)])
 
+correctForTilt = True
+if correctForTilt:
+    import getLaunchAndArrivalAnglesFromSPICEwithNewTiltMeasurements2020 as tilt2020
+
+    zen, azi, depths2 = tilt2020.getOffsetForAngularData()
+    fig4, ax4 = plt.subplots(1, 1)
+    ax4.plot(depths2, zen,linewidth=3,linestyle='solid',label='zenith')
+    ax4.plot(depths2, azi,linewidth=2,linestyle='dotted',label='azimuth')
+    ax4.legend()
+    ax4.set_xlabel(r'Z [m]')
+    ax4.set_ylabel(r'$\Delta$ receive azimuth from no tilt [$^{\circ}$]')
+    ax4.set_xlim(980,1700.0)
+    fig4.tight_layout()
+    fig4.savefig(PathToARIANNAanalysis + '/plots/changeInRecieveAngleFor2020TiltProfile.png')
+    fig4.savefig(PathToARIANNAanalysis + '/plots/changeInRecieveAngleFor2020TiltProfile.pdf')
+    for i in range(len(dataExpected[0])):
+        idx = hu.find_nearest(depths2, dataExpected[0][i])
+        dataExpected[1][i] += zen[idx]
+        dataExpected[2][i] += azi[idx]
 
 fig, ax = plt.subplots(1, 1,figsize=(11, 7),sharex=True)
 

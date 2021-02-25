@@ -37,6 +37,9 @@ Performs ray tracing code and stores the receive and launch angle along with plo
 **helpfulUtils.py**
 Some utility functions used by various scripts.
 
+**makeHistogramExample.py**
+Example code with example plot for dealing with weighted histograms that are either one sided or double sided.
+
 **matplotlibrc**
 Nice figure setting provided by Christian Glaser. This makes all figures plotted using matplotlib have these default setting such as ticks facing inward, and grid set to True. These settings are typically preferred in scientific papers. To use this on a unix based system, copy this file to *.config/matplotlib/* which should be in your home directoy.
 

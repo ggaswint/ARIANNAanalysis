@@ -10,7 +10,7 @@ PathToARIANNAanalysis = os.environ['ARIANNAanalysis']
 def getX(tilt, deltaY):
     return np.abs(np.tan(tilt) * deltaY)
 
-def getXvaluesFromSpiceTild(z_space):
+def getXvaluesFromSpiceTilt(z_space):
     z_space = np.flip(z_space)
     x = []
     xOffset1 = 0
@@ -43,6 +43,19 @@ def getXvaluesFromSpiceTild(z_space):
             x.append(xShift + xOffset2)
     return np.flip(np.asarray(x))
 
+def getXYspaceFromTiltProfileAtAngle(r, tiltSpace, angle):
+    xs = []
+    delAzimuths = []
+    for rprime in tiltSpace:
+        xprime = rprime * np.cos(np.deg2rad(angle))
+        yprime = rprime * np.sin(np.deg2rad(angle))
+        distance = r + xprime
+        tiltedDistance = np.sqrt(distance**2 + yprime**2)
+        xs.append(-tiltedDistance)
+        delAzimuths.append(np.arctan(yprime/distance))
+    return np.asarray(xs), np.rad2deg(-np.asarray(delAzimuths))
+    # New expected azimuth is larger than original, so delAzimuth = original - new makes delAzimuth negative
+
 def getPerpiniduclarXchange(spiceTiltLocations,r):
     azimuthAngleChanges = []
     new_x = []
@@ -74,6 +87,24 @@ def getAnglesFromSpice(x_space,z_space):
     return np.asarray(recieveAngles)
 
 
+def getOffsetForAngularData():
+    bottom = -1750.0
+    top = -425.0
+    r = 653.804524 # meters
+    phi = 312.448284
+
+    z_space = np.linspace(bottom,top,int(np.abs(bottom - top))+1)
+    x_space = -1*np.linspace(r,r,int(np.abs(bottom - top))+1)
+    changesInSpiceHoleRelativeToSurface = getXvaluesFromSpiceTilt(z_space)
+    recieveAnglesNoTilt = getAnglesFromSpice(x_space,z_space)
+
+    # Took azimuth measuremtn of 205 degrees with repsect to magnetic north (magnetic north is 32.7 degrees west of grid north; but we measure WRT grid east so 90 + 205 + 32.7)
+    actualTiltDirection = 327.7
+    x_space, azimuthChanges = getXYspaceFromTiltProfileAtAngle(r, changesInSpiceHoleRelativeToSurface, actualTiltDirection - phi)
+    recieveAngles = getAnglesFromSpice(x_space,z_space)
+
+    return recieveAngles-recieveAnglesNoTilt, azimuthChanges, -z_space
+
 if __name__ == "__main__":
     bottom = -1750.0
     top = -425.0
@@ -82,7 +113,7 @@ if __name__ == "__main__":
 
     fig1, ax1 = plt.subplots(1, 1)
     z_space = np.linspace(bottom,top,int(np.abs(bottom - top))+1)
-    x_space = getXvaluesFromSpiceTild(z_space)
+    x_space = getXvaluesFromSpiceTilt(z_space)
     azimuth_space = np.linspace(phi,phi,int(np.abs(bottom - top))+1)
 
     ax1.fill_between([0,20],[-1750,-1750],color='skyblue')
@@ -101,7 +132,7 @@ if __name__ == "__main__":
 
     z_space = np.linspace(bottom,top,int(np.abs(bottom - top))+1)
     x_space = -1*np.linspace(r,r,int(np.abs(bottom - top))+1)
-    changesInSpiceHoleRelativeToSurface = getXvaluesFromSpiceTild(z_space)
+    changesInSpiceHoleRelativeToSurface = getXvaluesFromSpiceTilt(z_space)
     recieveAnglesNoTilt = getAnglesFromSpice(x_space,z_space)
 
     x_space = -r + changesInSpiceHoleRelativeToSurface
@@ -136,5 +167,22 @@ if __name__ == "__main__":
     fig3.tight_layout()
     fig3.savefig(PathToARIANNAanalysis + '/plots/changeInRecieveAngleAzimuthWithTilt.png')
     fig3.savefig(PathToARIANNAanalysis + '/plots/changeInRecieveAngleAzimuthWithTilt.pdf')
+
+
+    # Took azimuth measuremtn of 205 degrees with repsect to magnetic north (magnetic north is 32.7 degrees west of grid north; but we measure WRT grid east so 90 + 205 + 32.7)
+    actualTiltDirection = 327.7
+    x_space, azimuthChanges = getXYspaceFromTiltProfileAtAngle(r, changesInSpiceHoleRelativeToSurface, actualTiltDirection - phi)
+    recieveAngles = getAnglesFromSpice(x_space,z_space)
+
+    fig4, ax4 = plt.subplots(1, 1)
+    ax4.plot(-z_space / units.m, recieveAngles-recieveAnglesNoTilt,linewidth=3,linestyle='solid',label='zenith')
+    ax4.plot(-z_space / units.m, azimuthChanges,linewidth=2,linestyle='dotted',label='azimuth')
+    ax4.legend()
+    ax4.set_xlabel(r'Z [m]')
+    ax4.set_ylabel(r'$\Delta$ receive azimuth from no tilt [$^{\circ}$]')
+    ax4.set_xlim(980,1700.0)
+    fig4.tight_layout()
+    #fig4.savefig(PathToARIANNAanalysis + '/plots/changeInRecieveAngleAzimuthWithTilt.png')
+    #fig4.savefig(PathToARIANNAanalysis + '/plots/changeInRecieveAngleAzimuthWithTilt.pdf')
 
     plt.show()

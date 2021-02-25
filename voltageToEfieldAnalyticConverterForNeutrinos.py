@@ -166,7 +166,7 @@ class voltageToAnalyticEfieldConverterNeutrinos:
 
                     # convolve efield with antenna response
                     rec_zenith, rec_azimuth = hp.cartesian_to_spherical(*receive_vectors[iA, iS])
-                    VEL = antenna_patterns[iA].get_antenna_response_vectorized(ff, rec_zenith, rec_azimuth, *antenna_orientations[iA])  # needs to be generalized that different channels have different antennas/orientations
+                    VEL = antenna_patterns[iA].get_antenna_response_vectorized(ff, rec_zenith, rec_azimuth, *antenna_orientations[iA])
                     voltage_spectrum = VEL["theta"] * eTheta + VEL["phi"] * ePhi
 
                     # add another time delay to account for propagation time differences

@@ -1,0 +1,15 @@
+#!/bin/bash
+#SBATCH --job-name=ggg_evt0
+#SBATCH -A sbarwick_lab
+#SBATCH -p free
+#SBATCH --nodes=1
+#SBATCH --ntasks=1
+#SBATCH --cpus-per-task=1
+#SBATCH --output=ggg_evt0
+export PYTHONPATH=$ARIANNAanalysis/../NuRadioMC:$PYTHONPATH
+export PYTHONPATH=$ARIANNAanalysis/../NuRadioReco:$PYTHONPATH
+export PYTHONPATH=$ARIANNAanalysis/../radiotools:$PYTHONPATH
+export PYTHONPATH=$ARIANNAanalysis/../nuRecoTest:$PYTHONPATH
+module load python/3.8.0
+cd $ARIANNAanalysis
+python runNeutrinoReconstruction.py 0

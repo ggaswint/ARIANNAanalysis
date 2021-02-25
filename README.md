@@ -43,6 +43,9 @@ Example code with example plot for dealing with weighted histograms that are eit
 **matplotlibrc**
 Nice figure setting provided by Christian Glaser. This makes all figures plotted using matplotlib have these default setting such as ticks facing inward, and grid set to True. These settings are typically preferred in scientific papers. To use this on a unix based system, copy this file to *.config/matplotlib/* which should be in your home directoy.
 
+**neutrinoJobEx.sub**
+Example job script for running a neutrino event direction and energy reconstruction on the HPC3 SLURM cluster. IMPORTANT: do not change the partition from free to something else unless you are in a hurry or your jobs keep failing. CPU-hours are expensive on HPC3; a simple mistake could cost thousands of dollars... In order to submit a job, use ($ squb neutrinoJobEx.sub) to add to queue. Note some of the arguments in this script may need to be changed depending on your environment. 
+
 **plotAmpResponse.py**
 Obtains from NuRadioReco and plots the ARIANNA 100, 200, and 300 series amplifier responses.
 

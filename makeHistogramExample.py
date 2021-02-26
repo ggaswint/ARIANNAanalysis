@@ -27,7 +27,7 @@ if __name__ == "__main__":
     tweights = np.ones_like(data)
     fig, ax = plt.subplots(1, 1, sharex=False, figsize=(5, 5))
     n, bins, patches = gaussianHist(ax,data,bins,color='black',line='-',label=r'Gaussian Norm',weights=tweights,useWeights=True,density=False)
-    label = getStatsSTDStrWeighted(data,tweights)
+    label = getStatsStrWeighted(data,tweights)
     ax.text(1.0,0.99,label,horizontalalignment='right',verticalalignment='top',transform=ax.transAxes,color='black')
 
     plt.show()

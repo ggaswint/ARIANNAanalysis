@@ -44,7 +44,7 @@ Example code with example plot for dealing with weighted histograms that are eit
 Nice figure setting provided by Christian Glaser. This makes all figures plotted using matplotlib have these default setting such as ticks facing inward, and grid set to True. These settings are typically preferred in scientific papers. To use this on a unix based system, copy this file to *.config/matplotlib/* which should be in your home directoy.
 
 **neutrinoJobEx.sub**
-Example job script for running a neutrino event direction and energy reconstruction on the HPC3 SLURM cluster. IMPORTANT: do not change the partition from free to something else unless you are in a hurry or your jobs keep failing. CPU-hours are expensive on HPC3; a simple mistake could cost thousands of dollars... In order to submit a job, use ($ squb neutrinoJobEx.sub) to add to queue. Note some of the arguments in this script may need to be changed depending on your environment. 
+Example job script for running a neutrino event direction and energy reconstruction on the HPC3 SLURM cluster. IMPORTANT: do not change the partition from free to something else unless you are in a hurry or your jobs keep failing. CPU-hours are expensive on HPC3; a simple mistake could cost thousands of dollars... In order to submit a job, use ($ squb neutrinoJobEx.sub) to add to queue. Note some of the arguments in this script may need to be changed depending on your environment.
 
 **plotAmpResponse.py**
 Obtains from NuRadioReco and plots the ARIANNA 100, 200, and 300 series amplifier responses.
@@ -137,6 +137,7 @@ Make root folder and clone GitHub repo
     $ cd
     $ mkdir root-6.18.00 && cd root-6.18.00
     $ git clone --branch v6-18-00-patches https://github.com/root-project/root.git root_src
+    $ cd root_build
 
 Make the build file and insure it is using python3! Note that *-DPYTHON_EXECUTABLE=/path/to/desired/python* needs to be modified with your correct python path to python3. If your system uses python3 by default (i.e. python foo.py runs in python3) then you should be able to get the path with typing *which python* in the command line.
 

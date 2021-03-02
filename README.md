@@ -137,7 +137,7 @@ Make root folder and clone GitHub repo
     $ cd
     $ mkdir root-6.18.00 && cd root-6.18.00
     $ git clone --branch v6-18-00-patches https://github.com/root-project/root.git root_src
-    $ cd root_build
+    $ mkdir root_build root_install && cd root_build
 
 Make the build file and insure it is using python3! Note that *-DPYTHON_EXECUTABLE=/path/to/desired/python* needs to be modified with your correct python path to python3. If your system uses python3 by default (i.e. python foo.py runs in python3) then you should be able to get the path with typing *which python* in the command line.
 

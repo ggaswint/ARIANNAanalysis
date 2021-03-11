@@ -75,7 +75,7 @@ def aveError(depth,data):
         means.append(data[mask].mean())
         stds.append(data[mask].std())
         depths.append(d)
-    return means, stds, depths
+    return np.asarray(means), np.asarray(stds), np.asarray(depths)
 
 
 # A few depths of interest that marks when the reflection coefficient becomes 0.5 or 0.1 or is TIR
@@ -136,6 +136,28 @@ ax[0].scatter(depths,means,s=size_marker,marker='s',color='darkred',label='Dipol
 ax[1].scatter(depths2,means2,s=size_marker,marker='s',color='darkred',label='Dipoles ave.')
 ax[0].scatter(depths3,means3,s=size_marker,marker='>',color='midnightblue',label='LPDAs ave.')
 ax[1].scatter(depths4,means4,s=size_marker,marker='>',color='midnightblue',label='LPDAs ave.')
+
+mask1700 = (depths > 1680.0) & (depths < 1710)
+mask1000 = (depths > 990.0) & (depths < 1010)
+print(errors[mask1700])
+print(errors[mask1000])
+
+mask1700 = (depths2 > 1680.0) & (depths2 < 1710)
+mask1000 = (depths2 > 990.0) & (depths2 < 1010)
+print(errors2[mask1700])
+print(errors2[mask1000])
+
+mask1700 = (depths3 > 1680.0) & (depths3 < 1710)
+mask1000 = (depths3 > 990.0) & (depths3 < 1010)
+print(errors3[mask1700])
+print(errors3[mask1000])
+
+mask1700 = (depths4 > 1680.0) & (depths4 < 1710)
+mask1000 = (depths4 > 990.0) & (depths4 < 1010)
+print(errors4[mask1700])
+print(errors4[mask1000])
+print(1/0)
+
 
 mask_space1 = (np.asarray(depth) <= 920.0)
 mask_space2 = (np.asarray(depth) >= 920.0) & (np.asarray(depth) <= 1250.0)

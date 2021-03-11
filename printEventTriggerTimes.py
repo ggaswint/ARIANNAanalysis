@@ -10,8 +10,8 @@ def printTimes(file):
     n_events = readARIANNAData.begin([file])
     event_count = 0
     for evt in readARIANNAData.run():
-        for station_object in evt.get_stations():
-            print_str = 'event: ' + str(event_count) + ' time: ' + str(station_object.get_station_time())
+        for station in evt.get_stations():
+            print_str = 'event: ' + str(event_count) + ' time: ' + str(station.get_station_time())
             print(print_str)
             event_count += 1
 

@@ -383,6 +383,7 @@ def plot_electric_fields(etheta,ephi,x_theta,angle,set_mltp,i):
         ax[1].set_ylim(-1.1*np.max(ephi),1.1*np.max(ephi))
         ax[0].set_xlim(200,700)
         ax[1].set_xlim(200,700)
+        #save = PathToARIANNAanalysis + '/data/expectedEfieldSpice2019noBandPassFilter'
         #np.save(savefile,[e_times*1e9,etheta,ephi])
         title = 'angle: ' + str(int(angle)) + ' pol: ' + str(np.rad2deg(np.arctan(np.asarray(max_ephi/max_etheta))))
         f.suptitle(title)

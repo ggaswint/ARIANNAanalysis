@@ -328,7 +328,7 @@ class voltageToAnalyticEfieldConverterNeutrinos:
             vertex_position = sim_shower[shp.vertex]
 
         else:
-            vertex_position = station_object.get_parameter(stnp.nu_vertex)
+            vertex_position = station.get_parameter(stnp.nu_vertex)
 
 
         n_index = icemodel.get_index_of_refraction(vertex_position)
